@@ -1,0 +1,9 @@
+node_modules
+dist
+coverage
+reports
+.stryker-tmp
+demo/dist
+test-results
+playwright-report
+.agent-docs/*/logs

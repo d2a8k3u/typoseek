@@ -1,0 +1,128 @@
+{
+  "name": "typoseek",
+  "version": "0.0.0",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./serialize": {
+      "import": {
+        "types": "./dist/serialize.d.mts",
+        "default": "./dist/serialize.mjs"
+      },
+      "require": {
+        "types": "./dist/serialize.d.cts",
+        "default": "./dist/serialize.cjs"
+      }
+    },
+    "./segmenter": {
+      "import": {
+        "types": "./dist/segmenter.d.mts",
+        "default": "./dist/segmenter.mjs"
+      },
+      "require": {
+        "types": "./dist/segmenter.d.cts",
+        "default": "./dist/segmenter.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.cts",
+  "typesVersions": {
+    "*": {
+      "serialize": [
+        "./dist/serialize.d.cts"
+      ],
+      "segmenter": [
+        "./dist/segmenter.d.cts"
+      ]
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT",
+  "author": "David Kulhanek (https://github.com/d2a8k3u)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/d2a8k3u/typoseek.git"
+  },
+  "homepage": "https://github.com/d2a8k3u/typoseek#readme",
+  "bugs": {
+    "url": "https://github.com/d2a8k3u/typoseek/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "prepack": "npm run build",
+    "typecheck": "tsc -p tsconfig.build.json --noEmit && tsc -p tsconfig.json --noEmit && tsc -p demo/tsconfig.json --noEmit",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test:unit": "vitest run test/unit test/docs",
+    "test:coverage": "vitest run test/unit test/docs --coverage",
+    "test:stress": "vitest run test/stress",
+    "test:package": "vitest run test/package",
+    "test:runtimes": "vitest run test/runtimes",
+    "test:demo": "npm run demo:build && playwright test",
+    "test:mutation": "stryker run",
+    "check:package": "attw --pack .",
+    "size": "npm run build && size-limit",
+    "knip": "knip",
+    "api:check": "npm run build && api-extractor run -c api-extractor/index.json && api-extractor run -c api-extractor/serialize.json && api-extractor run -c api-extractor/segmenter.json",
+    "api:update": "npm run build && api-extractor run --local -c api-extractor/index.json && api-extractor run --local -c api-extractor/serialize.json && api-extractor run --local -c api-extractor/segmenter.json",
+    "demo:build": "tsdown -c tsdown.demo.config.ts",
+    "bench": "npm run build && node --expose-gc bench/run.ts",
+    "release:version": "changeset version"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "0.18.5",
+    "@axe-core/playwright": "^4.14.0",
+    "@changesets/cli": "^3.0.3",
+    "@eslint/js": "^10.0.1",
+    "@leeoniya/ufuzzy": "1.0.19",
+    "@microsoft/api-extractor": "^7.60.1",
+    "@orama/orama": "3.1.18",
+    "@playwright/test": "^1.65.0",
+    "@size-limit/preset-small-lib": "^14.3.0",
+    "@stryker-mutator/core": "^10.1.1",
+    "@stryker-mutator/vitest-runner": "^10.1.1",
+    "@types/node": "^24.19.2",
+    "@vitest/coverage-v8": "^5.1.0",
+    "eslint": "^10.14.0",
+    "fast-check": "^4.10.2",
+    "flexsearch": "0.8.212",
+    "fuse.js": "7.5.0",
+    "fuzzysort": "4.0.2",
+    "globals": "^17.14.0",
+    "knip": "^6.44.2",
+    "match-sorter": "8.3.1",
+    "minisearch": "7.2.0",
+    "prettier": "^3.9.10",
+    "prettier-plugin-organize-imports": "^4.3.0",
+    "publint": "0.3.25",
+    "size-limit": "^14.3.0",
+    "tinybench": "^6.2.3",
+    "tsdown": "0.23.7",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.2",
+    "vite": "^8.3.7",
+    "vitest": "^5.1.0"
+  }
+}

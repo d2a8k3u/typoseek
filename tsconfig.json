@@ -1,0 +1,23 @@
+{
+  "extends": "./tsconfig.build.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "paths": {
+      "typoseek": ["./src/index.ts"],
+      "typoseek/*": ["./src/*"]
+    }
+  },
+  "include": [
+    "src",
+    "test",
+    "bench",
+    "examples",
+    "vitest.config.ts",
+    "vitest.stryker.config.ts",
+    "tsdown.config.ts",
+    "tsdown.demo.config.ts",
+    "playwright.config.ts"
+  ]
+}
