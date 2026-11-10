@@ -1,7 +1,14 @@
 import fc from 'fast-check';
 import { expect, test } from 'vitest';
+import { boundedOsaDistance, boundedPrefixDistance } from '../../../src/core/distance.ts';
 import { expandTerm, INFIX_SCAN_PER_EXPANSION, type ExpansionPolicy } from '../../../src/core/expand.ts';
-import { gramLists, referenceExpansion, vocabularyTree } from '../../support/reference.ts';
+import {
+  editMatrixBoundedDistance,
+  editMatrixBoundedPrefixDistance,
+  gramLists,
+  referenceExpansion,
+  vocabularyTree,
+} from '../../support/reference.ts';
 
 const RUNS = 1_000;
 const GRAM_CHUNK_CAPACITY = 512;
@@ -41,6 +48,26 @@ const policy: fc.Arbitrary<ExpansionPolicy> = fc.record({
 
 const chunkLengths = fc.array(fc.integer({ min: 1, max: GRAM_CHUNK_CAPACITY }), { minLength: 1, maxLength: 8 });
 const shortChunkLengths = fc.array(fc.integer({ min: 1, max: 3 }), { minLength: 1, maxLength: 8 });
+
+test('the distances the brute-force scan computes equal a full edit matrix that shares no code with the walk', () => {
+  fc.assert(
+    fc.property(
+      word(MAX_QUERY_LENGTH),
+      word(MAX_QUERY_LENGTH),
+      fc.constantFrom(0, 1, 2),
+      fc.boolean(),
+      (query, other, maxEdits, termIsBuiltAroundTheQuery) => {
+        const term = termIsBuiltAroundTheQuery ? `${other.slice(0, 1)}${query}${other.slice(1)}` : other;
+
+        expect(boundedOsaDistance(query, term, maxEdits)).toBe(editMatrixBoundedDistance(query, term, maxEdits));
+        expect(boundedPrefixDistance(query, term, maxEdits)).toBe(
+          editMatrixBoundedPrefixDistance(query, term, maxEdits),
+        );
+      },
+    ),
+    { numRuns: RUNS },
+  );
+});
 
 test('expansion equals a brute-force scan of the vocabulary, whatever the chunk boundaries of the gram lists', () => {
   fc.assert(

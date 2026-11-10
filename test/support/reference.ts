@@ -87,6 +87,56 @@ export function gramLists(
   return lists;
 }
 
+function editMatrixDistance(source: readonly string[], target: readonly string[]): number {
+  const known = new Map<number, number>();
+  const width = target.length + 1;
+  const distanceBetweenStarts = (sourceLength: number, targetLength: number): number => {
+    if (sourceLength === 0 || targetLength === 0) {
+      return sourceLength + targetLength;
+    }
+    const cell = sourceLength * width + targetLength;
+    const sourceCharacter = source[sourceLength - 1];
+    const targetCharacter = target[targetLength - 1];
+    const endsInAdjacentSwap =
+      sourceLength > 1 &&
+      targetLength > 1 &&
+      sourceCharacter === target[targetLength - 2] &&
+      source[sourceLength - 2] === targetCharacter;
+    const distance =
+      known.get(cell) ??
+      Math.min(
+        distanceBetweenStarts(sourceLength - 1, targetLength) + 1,
+        distanceBetweenStarts(sourceLength, targetLength - 1) + 1,
+        distanceBetweenStarts(sourceLength - 1, targetLength - 1) + (sourceCharacter === targetCharacter ? 0 : 1),
+        endsInAdjacentSwap ? distanceBetweenStarts(sourceLength - 2, targetLength - 2) + 1 : Number.POSITIVE_INFINITY,
+      );
+    known.set(cell, distance);
+    return distance;
+  };
+  return distanceBetweenStarts(source.length, target.length);
+}
+
+function withinEdits(distance: number, maxEdits: number): number | undefined {
+  return distance <= maxEdits ? distance : undefined;
+}
+
+export function editMatrixBoundedDistance(a: string, b: string, maxEdits: number): number | undefined {
+  return withinEdits(editMatrixDistance(Array.from(a), Array.from(b)), maxEdits);
+}
+
+export function editMatrixBoundedPrefixDistance(
+  query: string,
+  candidate: string,
+  maxEdits: number,
+): number | undefined {
+  const source = Array.from(query);
+  const target = Array.from(candidate);
+  const prefixDistances = Array.from({ length: target.length + 1 }, (_, prefixLength) =>
+    editMatrixDistance(source, target.slice(0, prefixLength)),
+  );
+  return withinEdits(Math.min(...prefixDistances), maxEdits);
+}
+
 export type ReferenceMatch = Omit<Expansion<VocabularyEntry>, 'value'>;
 
 function match(query: string, term: string, kind: MatchKind, distance: number): ReferenceMatch {
