@@ -410,6 +410,14 @@ function existingTermEntry(terms: RadixTree<TermEntry>, term: string): TermEntry
   return entry;
 }
 
+function removeSurfaceId(entry: TermEntry, surfaceId: number): void {
+  const position = entry.surfaceIds.indexOf(surfaceId);
+  if (position === -1) {
+    throw invariantViolation('a pruned surface is missing from its term');
+  }
+  entry.surfaceIds.splice(position, 1);
+}
+
 export function retractRecord<T>(state: IndexState<T>, docNum: number): ReadonlySet<number> {
   const doc = state.docs.get(docNum);
   if (doc === undefined) {
@@ -443,7 +451,7 @@ export function pruneSurfaces<T>(state: IndexState<T>, surfaceIds: ReadonlySet<n
     state.freeSurfaceIds.push(surfaceId);
     if (term !== undefined) {
       const entry = existingTermEntry(state.terms, term);
-      entry.surfaceIds.splice(entry.surfaceIds.indexOf(surfaceId), 1);
+      removeSurfaceId(entry, surfaceId);
       if (entry.surfaceIds.length === 0) {
         state.terms.delete(term);
         deleted.push(entry);

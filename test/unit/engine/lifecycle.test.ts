@@ -208,6 +208,23 @@ describe('commit, retract and prune', () => {
     expect(state.freeSurfaceIds).toEqual([0, 1, 3]);
   });
 
+  test('retracts the postings of a later record under its own docNum and key path, leaving the others', () => {
+    const state = stateWithTwoRecords();
+
+    remove(state, 'b');
+
+    expect(termTable(state, ['fox'])).toEqual([
+      [
+        'fox',
+        [
+          [0, 1],
+          [1, 1],
+        ],
+        [2],
+      ],
+    ]);
+  });
+
   test('updates a record in place, keeping its docNum and the surfaces its new version still uses', () => {
     const state = stateWithTwoRecords();
     const updated = { id: 'a', title: 'fox', body: 'blue' };
@@ -277,6 +294,7 @@ describe('gram lists', () => {
       che: 'searcher',
       her: 'searcher',
     });
+    expectGramInvariant(state);
 
     update(state, { id: 2, title: 'preacher' });
 
@@ -287,6 +305,7 @@ describe('gram lists', () => {
       che: 'preacher',
       her: 'preacher',
     });
+    expectGramInvariant(state);
   });
 
   test('cuts a list that one commit creates evenly into chunks of at most half the capacity', () => {
@@ -413,6 +432,14 @@ describe('invariant violations', () => {
       },
     ],
     ['a retract of a docNum that is not indexed', (state: KeyedState<unknown>) => retractRecord(state, 7)],
+    [
+      'a prune of a surface its term does not list',
+      (state: KeyedState<unknown>) => {
+        addAll(state, [{ id: 'a', title: 'fox' }]);
+        state.terms.get('fox')?.surfaceIds.pop();
+        remove(state, 'a');
+      },
+    ],
     [
       'an average over a field index outside the key paths',
       (state: KeyedState<unknown>) => averageFieldLength(state, 1),
