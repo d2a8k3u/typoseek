@@ -11,7 +11,7 @@ export function tokenize(text: string): TokenSpan[] {
   }));
 }
 
-function isIterableObject(value: unknown): value is Iterable<unknown> {
+export function isIterableObject(value: unknown): value is Iterable<unknown> {
   return (
     typeof value === 'object' &&
     value !== null &&
