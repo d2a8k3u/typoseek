@@ -60,6 +60,12 @@ describe('FR-4 ranking', () => {
     expect(hitIds(response)).toEqual([3, 2, 1]);
   });
 
+  test('a record ranks by its best match for a query term, not by a weaker match it also holds', () => {
+    const response = searchRecords(docs('catalog', 'catalog cat'), TEXT_KEY, 'cat');
+
+    expect(hitIds(response)).toEqual([2, 1]);
+  });
+
   describe('(e) infix matching only for the last token of the query when it is a positive term clause of 3 or more code points', () => {
     const state = buildState(docs('bobcat', 'bobcat big dog', 'tomcat lynx'), TEXT_KEY);
 
@@ -87,6 +93,15 @@ test('with fold: false the term frequency counts only tokens equal to the query 
   const response = searchRecords(records, { keys: ['title', 'body'] }, 'Café', { fold: false });
 
   expect(hitIds(response)).toEqual([2, 1]);
+});
+
+test('with mode or a record matching more clauses ranks above a record whose fewer matches score higher', () => {
+  const longRecordFillerWords = 18;
+  const records = docs('zebra', `zebra lion${' filler'.repeat(longRecordFillerWords)}`, 'lion');
+
+  const response = searchRecords(records, TEXT_KEY, 'zebra lion', { mode: 'or' });
+
+  expect(hitIds(response)).toEqual([2, 1, 3]);
 });
 
 test('a positive term repeated in the query counts as one clause', () => {

@@ -33,6 +33,7 @@ describe('FR-2 operators and each pair of them', () => {
     { operators: 'prefix', query: 'cher', mode: 'and', ids: [3] },
     { operators: 'phrase', query: '"apple pie"', mode: 'and', ids: [1] },
     { operators: 'phrase in order', query: '"red apple"', mode: 'and', ids: [1] },
+    { operators: 'phrase of adjacent words', query: '"red pie"', mode: 'and', ids: [] },
     { operators: 'negation', query: '-red', mode: 'and', ids: [2, 5] },
     { operators: 'AND with prefix', query: 'red appl', mode: 'and', ids: [1, 4, 6] },
     { operators: 'AND with phrase', query: 'pie "red apple"', mode: 'and', ids: [1] },
@@ -41,7 +42,7 @@ describe('FR-2 operators and each pair of them', () => {
     { operators: 'OR with phrase', query: 'juice "red cherry"', mode: 'or', ids: [3, 5] },
     { operators: 'OR with negation', query: 'tart pie -cherry', mode: 'or', ids: [1, 2] },
     { operators: 'prefix after a phrase', query: '"apple pie" re', mode: 'and', ids: [1] },
-    { operators: 'no prefix before a closing phrase', query: 'appl "red cherry"', mode: 'and', ids: [] },
+    { operators: 'no prefix before a closing phrase', query: 'appl "red apple"', mode: 'and', ids: [] },
     { operators: 'prefix after a negation', query: '-tart appl', mode: 'and', ids: [1, 4, 6] },
     { operators: 'no prefix before a closing negation', query: 'appl -tart', mode: 'and', ids: [] },
     { operators: 'negated phrase', query: 'apple -"red apple"', mode: 'and', ids: [2, 4] },
@@ -100,4 +101,16 @@ test('a stop word inside a phrase holds the place of any one token', () => {
   const response = searchRecords(records, { keys: ['text'], stopWords: ['a'] }, '"slice a pie"');
 
   expect(hitIds(response)).toEqual([1]);
+});
+
+test('a phrase matches inside one value of one key path, never across values or key paths', () => {
+  const records = [
+    { id: 1, title: 'red', tags: ['cherry pie'] },
+    { id: 2, title: 'plain', tags: ['red', 'cherry'] },
+    { id: 3, title: 'plain', tags: ['red a cherry'] },
+  ];
+
+  const response = searchRecords(records, { keys: ['title', 'tags'], stopWords: ['a'] }, '"red a cherry"');
+
+  expect(hitIds(response)).toEqual([3]);
 });
