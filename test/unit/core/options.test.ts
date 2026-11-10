@@ -309,6 +309,7 @@ describe('resolveSearchOptions', () => {
     ],
     ['minLengthForOne above the default minLengthForTwo', { typos: { minLengthForOne: 9 } }, 'typos.minLengthForTwo'],
     ['a fractional minLengthForTwo', { typos: { minLengthForTwo: 8.5 } }, 'typos.minLengthForTwo'],
+    ['a null minLengthForTwo', { typos: { minLengthForTwo: null } }, 'typos.minLengthForTwo'],
     ['an invalid filter', { filter: 'n' }, 'filter'],
     ['an invalid sortBy', { sortBy: 'n' }, 'sortBy'],
   ])('rejects %s as INVALID_OPTION naming the option', (_label, options, option) => {

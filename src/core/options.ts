@@ -349,7 +349,7 @@ function typosOption(value: unknown): ResolvedTypos | false {
     DEFAULT_TYPOS.minLengthForOne,
     MIN_LENGTH_FOR_ONE_RANGE,
   );
-  const minLengthForTwo = value.minLengthForTwo ?? DEFAULT_TYPOS.minLengthForTwo;
+  const { minLengthForTwo = DEFAULT_TYPOS.minLengthForTwo } = value;
   if (!isMinLengthForTwo(minLengthForTwo, minLengthForOne)) {
     throw invalidOption('typos.minLengthForTwo must be an integer >= typos.minLengthForOne, or Infinity');
   }
