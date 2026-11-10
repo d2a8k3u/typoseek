@@ -299,7 +299,7 @@ function committingTermEntries(terms: RadixTree<TermEntry>, created: TermEntry[]
   };
 }
 
-function knownSurface(state: IndexState<unknown>, surfaceId: number): SurfaceEntry {
+export function knownSurface(state: IndexState<unknown>, surfaceId: number): SurfaceEntry {
   const surface = state.surfacesById.get(surfaceId);
   if (surface === undefined) {
     throw invariantViolation('a stream references an unknown surface id');
@@ -459,6 +459,39 @@ export function pruneSurfaces<T>(state: IndexState<T>, surfaceIds: ReadonlySet<n
     }
   }
   removeFromGramLists(state.grams, deleted);
+}
+
+export function indexedDoc<T>(state: IndexState<T>, docNum: number): DocEntry<T> {
+  const doc = state.docs.get(docNum);
+  if (doc === undefined) {
+    throw invariantViolation('a posting or a ranked record refers to a docNum that is not indexed');
+  }
+  return doc;
+}
+
+export interface ValueRun<F> {
+  readonly field: F;
+  readonly fieldIndex: number;
+  readonly valueIndex: number;
+  readonly slots: Int32Array;
+}
+
+export function* valueRuns<F>(stream: Int32Array, fields: readonly F[]): Generator<ValueRun<F>, undefined> {
+  let start = fields.length;
+  for (const [fieldIndex, field] of fields.entries()) {
+    let valueIndex = 0;
+    let end = start;
+    for (; end < stream.length && stream[end] !== FIELD_BREAK; end += 1) {
+      if (stream[end] === VALUE_BREAK) {
+        yield { field, fieldIndex, valueIndex, slots: stream.subarray(start, end) };
+        valueIndex += 1;
+        start = end + 1;
+      }
+    }
+    yield { field, fieldIndex, valueIndex, slots: stream.subarray(start, end) };
+    start = end + 1;
+  }
+  return undefined;
 }
 
 export function averageFieldLength<T>(state: IndexState<T>, fieldIndex: number): number {
