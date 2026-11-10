@@ -1,0 +1,12 @@
+.agent-docs
+etc
+bench/results
+CHANGELOG.md
+dist
+coverage
+demo/dist
+reports
+.stryker-tmp
+test-results
+playwright-report
+package-lock.json
