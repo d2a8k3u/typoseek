@@ -75,4 +75,8 @@ describe('resolveValues', () => {
 
     expect(resolveValues({ leaves }, ['leaves'])).toEqual(['s', 2, false, null, { dateMs: 5 }, { dateMs: 9 }]);
   });
+
+  test('yields no value for an object that only claims to be a Date through Symbol.toStringTag', () => {
+    expect(resolveValues({ at: { [Symbol.toStringTag]: 'Date' } }, ['at'])).toEqual([]);
+  });
 });

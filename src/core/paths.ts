@@ -79,7 +79,12 @@ export function resolveText(record: unknown, segments: readonly string[]): reado
 export type ComparableValue = string | number | boolean | null | { readonly dateMs: number };
 
 function isDate(value: unknown): value is Date {
-  return Object.prototype.toString.call(value) === '[object Date]';
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    !(Symbol.toStringTag in value) &&
+    Object.prototype.toString.call(value) === '[object Date]'
+  );
 }
 
 export function toComparableValue(value: unknown): ComparableValue | undefined {
