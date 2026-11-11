@@ -39,13 +39,16 @@ describe('front door input checks', () => {
     expect(() => searchFor(null)).toThrow(typoseekError('INVALID_OPTION'));
   });
 
-  test('rejects records that are not an array in addAll by throwing and in addAllAsync by rejecting', async () => {
-    const index = uncheckedIndex(noteIndex());
+  test('rejects records that are not an array in addAll by throwing and in addAllAsync by rejecting, leaving the index empty and idle', async () => {
+    const index = noteIndex();
+    const unchecked = uncheckedIndex(index);
     const record = { id: 1, text: 'fox' };
 
-    expect(() => index.addAll(record)).toThrow(typoseekError('INVALID_OPTION'));
-    await expect(index.addAllAsync(record)).rejects.toEqual(typoseekError('INVALID_OPTION'));
-    expect(noteIndex().size).toBe(0);
+    expect(() => unchecked.addAll(record)).toThrow(typoseekError('INVALID_OPTION'));
+    await expect(unchecked.addAllAsync(record)).rejects.toEqual(typoseekError('INVALID_OPTION'));
+    expect(index.size).toBe(0);
+    index.add(record);
+    expect(index.size).toBe(1);
   });
 
   test.each([
