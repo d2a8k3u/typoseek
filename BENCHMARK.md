@@ -63,7 +63,7 @@ The libraries do not match the same records, so read latency next to how many of
 | fuzzysort  | 0.03                     | 0.1                     | 0.12                      | 0.8                      |
 | uFuzzy     | 3                        | 1.5                     | 28                        | 15.6                     |
 
-At 100,000 records typoseek retains 118.5 MB of heap; the median of the six other libraries is 116.0 MB. typoseek also keeps 1.1 MB in array buffers (its record token streams), which `heapUsed` does not count; the other libraries keep none.
+At 100,000 records typoseek retains 118.5 MB of heap, plus 1.13 MB in array buffers (its record token streams), which `heapUsed` does not count; the other libraries keep none. The median of the six other libraries is 116.0 MB, so typoseek misses its memory target, retained heap below that median, by 2.5 MB (2.2%).
 
 ## Async indexing
 
