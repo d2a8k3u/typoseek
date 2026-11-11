@@ -1,6 +1,7 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 import { foldTerm } from '../../../src/core/fold.ts';
-import { FIELD_BREAK, VALUE_BREAK } from '../../../src/engine/state.ts';
+import { tokenize as wordTokenize } from '../../../src/core/tokenize.ts';
+import { createState, FIELD_BREAK, VALUE_BREAK } from '../../../src/engine/state.ts';
 import { createIndex } from '../../../src/index.ts';
 import { loadIndex } from '../../../src/serialize.ts';
 import type {
@@ -11,6 +12,11 @@ import type {
   Tokenizer,
   TokenSpan,
 } from '../../../src/types.ts';
+
+vi.mock(import('../../../src/engine/state.ts'), async (importOriginal) => {
+  const original = await importOriginal();
+  return { ...original, createState: vi.fn(original.createState) as typeof original.createState };
+});
 
 interface Doc {
   readonly id: string;
@@ -49,6 +55,10 @@ const BASE: SerializedIndex<Doc> = {
 
 const INVALID = 'INVALID_SERIALIZED_INDEX';
 
+const TOO_LARGE = 'SERIALIZED_INDEX_TOO_LARGE';
+
+const MAX_ARRAY_LENGTH = 2 ** 32 - 1;
+
 const QUERIES = ['', 'the', 'red', 'fox', 'red fox', 'fx', 'den', 'ow', '"red owl"', 'owl -den'];
 
 const loadUnchecked = loadIndex as (data: unknown, options?: unknown) => SearchIndex<Doc>;
@@ -77,6 +87,19 @@ function withStream(recordIndex: number, stream: unknown): unknown {
 
 function withSurface(position: number, surface: unknown): unknown {
   return { ...BASE, surfaces: BASE.surfaces.map((listed, index) => (index === position ? surface : listed)) };
+}
+
+function sparseArray(length: number): unknown[] {
+  const sparse: unknown[] = [];
+  sparse.length = length;
+  return sparse;
+}
+
+function recordingTokenizer(tokenized: string[]): Tokenizer {
+  return (text) => {
+    tokenized.push(text);
+    return wordTokenize(text);
+  };
 }
 
 function expectSameSearches(loaded: SearchIndex<Doc>, original: SearchIndex<Doc>): void {
@@ -194,6 +217,7 @@ describe('loadIndex rejects a snapshot with a typed error', () => {
     ['surfaces over maxSurfaces', { maxSurfaces: 3 }],
     ['stop terms over maxStopTerms', { maxStopTerms: 1 }],
     ['stream slots over maxTokens', { maxTokens: 13 }],
+    ['array and text lengths over maxTextLength', { maxTextLength: 25 }],
   ])('that is oversized: %s', (_, loadLimits) => {
     expect(() => loadIndex(BASE, { loadLimits })).toThrow(typoseekError('SERIALIZED_INDEX_TOO_LARGE'));
   });
@@ -320,9 +344,117 @@ describe('loadIndex rejects a snapshot with a typed error', () => {
   });
 
   test('loads a snapshot exactly at every load limit', () => {
-    const loaded = loadIndex(BASE, { loadLimits: { maxRecords: 2, maxSurfaces: 4, maxStopTerms: 2, maxTokens: 14 } });
+    const loaded = loadIndex(BASE, {
+      loadLimits: { maxRecords: 2, maxSurfaces: 4, maxStopTerms: 2, maxTokens: 14, maxTextLength: 26 },
+    });
 
     expect(loaded.size).toBe(2);
+  });
+});
+
+describe('loadIndex charges one maxTextLength budget for walked arrays and text values', () => {
+  const SHARED_TEXT_LENGTH = 10_000_000;
+
+  const SHARING_RECORD_COUNT = 101;
+
+  const KEY_PATH_COUNT = 1_000;
+
+  const SLOT_COUNT = 100_000;
+
+  const KEY_PATHS_LOAD_TIMEOUT_MS = 30_000;
+
+  function keyPathsOverOneArray(): unknown {
+    const keys = Array.from({ length: KEY_PATH_COUNT }, (_, index) => ({ path: `a.k${String(index)}`, weight: 1 }));
+    const stream = [
+      ...Array.from({ length: KEY_PATH_COUNT }, () => 0),
+      ...Array.from({ length: KEY_PATH_COUNT - 1 }, () => FIELD_BREAK),
+    ];
+    const item = { id: 'a', a: Array.from({ length: SLOT_COUNT }, () => null) };
+    return viaJson({ ...BASE, keys, surfaces: [], records: [[item, stream]] });
+  }
+
+  test('rejects a cloned snapshot whose item holds a sparse array of length 2^32 - 1 at the default limits and builds nothing', () => {
+    const before = Object.getOwnPropertyDescriptors(Object.prototype);
+    const hostileItem = JSON.parse('{ "__proto__": { "polluted": true }, "id": "b", "title": "fox" }') as object;
+    const tags = sparseArray(MAX_ARRAY_LENGTH);
+    tags[7] = 'fox';
+    const hostile = structuredClone(withItem(1, { ...hostileItem, tags }));
+    vi.mocked(createState).mockClear();
+
+    expect(() => loadIndex(hostile)).toThrow(typoseekError(TOO_LARGE));
+    expect(createState).not.toHaveBeenCalled();
+    expect(Object.getOwnPropertyDescriptors(Object.prototype)).toEqual(before);
+  });
+
+  test('rejects a cloned snapshot whose 101 records share one string of 10,000,000 code units at the default limits', () => {
+    const shared = { text: 'a'.repeat(SHARED_TEXT_LENGTH) };
+    const records = Array.from({ length: SHARING_RECORD_COUNT }, (_, index) => [
+      { id: `r${String(index)}`, body: shared },
+      [0],
+    ]);
+    const hostile = structuredClone({ ...BASE, keys: [{ path: 'body.text', weight: 1 }], surfaces: [], records });
+
+    expect(() => loadIndex(hostile, { tokenize: () => [] })).toThrow(typoseekError(TOO_LARGE));
+  });
+
+  test(
+    'charges 1,000 key paths over one 100,000-slot array of a JSON snapshot once each: loads at their product, rejects below',
+    () => {
+      const snapshot = keyPathsOverOneArray();
+
+      expect(loadIndex(snapshot, { loadLimits: { maxTextLength: KEY_PATH_COUNT * SLOT_COUNT } }).size).toBe(1);
+      expect(() => loadIndex(snapshot, { loadLimits: { maxTextLength: 2 * SLOT_COUNT - 1 } })).toThrow(
+        typoseekError(TOO_LARGE),
+      );
+    },
+    KEY_PATHS_LOAD_TIMEOUT_MS,
+  );
+
+  test('loads a snapshot whose charged sum ends in an array length, holes included, at maxTextLength and rejects it at one less', () => {
+    const data = {
+      ...BASE,
+      surfaces: [['fox', 'fox']],
+      records: [[{ id: 'a', title: 'fox', tags: sparseArray(4) }, [1, 0, 0, FIELD_BREAK]]],
+    };
+
+    expect(loadIndex(data, { loadLimits: { maxTextLength: 7 } }).size).toBe(1);
+    expect(() => loadIndex(data, { loadLimits: { maxTextLength: 6 } })).toThrow(
+      expect.objectContaining({
+        code: TOO_LARGE,
+        message: 'array and text lengths exceed loadLimits.maxTextLength of 6',
+      }),
+    );
+  });
+
+  test('rejects a sparse array of length 2^32 - 1 before reading any of its slots or calling the tokenizer', () => {
+    const slotReads: PropertyKey[] = [];
+    const title = new Proxy(sparseArray(MAX_ARRAY_LENGTH), {
+      get: (target, key, receiver): unknown => {
+        if (key !== 'length') {
+          slotReads.push(key);
+        }
+        return Reflect.get(target, key, receiver);
+      },
+      getOwnPropertyDescriptor: (target, key) => {
+        slotReads.push(key);
+        return Reflect.getOwnPropertyDescriptor(target, key);
+      },
+    });
+    const tokenized: string[] = [];
+
+    expect(() => loadIndex(withItem(0, { ...RED_FOX, title }), { tokenize: recordingTokenizer(tokenized) })).toThrow(
+      typoseekError(TOO_LARGE),
+    );
+    expect(tokenized).toEqual([]);
+    expect(slotReads).toEqual([]);
+  });
+
+  test('rejects a text value over the remaining budget, a number text included, before the tokenizer reads it', () => {
+    const tokenized: string[] = [];
+    const options = { tokenize: recordingTokenizer(tokenized), loadLimits: { maxTextLength: 15 } };
+
+    expect(() => loadIndex(withItem(0, { ...RED_FOX, tags: [1234] }), options)).toThrow(typoseekError(TOO_LARGE));
+    expect(tokenized).toEqual(['The Red fox']);
   });
 });
 

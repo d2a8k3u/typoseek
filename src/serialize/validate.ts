@@ -7,7 +7,7 @@ import {
   type PipelineHooks,
   type ResolvedField,
 } from '../core/options';
-import { isArray, isObjectRecord, resolveText } from '../core/paths';
+import { isArray, isObjectRecord, resolveMeteredText } from '../core/paths';
 import { isIterableObject, validateSpans } from '../core/tokenize';
 import { createPipeline, isValidId } from '../engine/prepare';
 import {
@@ -56,6 +56,11 @@ interface SnapshotOptions {
 interface FieldRuns {
   readonly field: ResolvedField;
   readonly runs: ValueRun<ResolvedField>[];
+}
+
+interface MeteredText {
+  readonly resolve: (item: unknown, segments: readonly string[]) => readonly string[];
+  readonly tokenize: Tokenizer;
 }
 
 const LIMIT_KEYS: readonly string[] = Object.keys(DEFAULT_LIMITS);
@@ -302,15 +307,30 @@ function runsByField(stream: Int32Array, fields: readonly ResolvedField[]): read
   return grouped;
 }
 
+function meteredText(tokenize: Tokenizer, maxTextLength: number): MeteredText {
+  let charged = 0;
+  const charge = (units: number): void => {
+    charged += units;
+    checkCount(charged, maxTextLength, 'array and text lengths', 'maxTextLength');
+  };
+  return {
+    resolve: (item, segments) => resolveMeteredText(item, segments, charge),
+    tokenize: (text) => {
+      charge(text.length);
+      return tokenize(text);
+    },
+  };
+}
+
 function checkRecordText(
   { item, stream }: PreparedRecord<object>,
   recordIndex: number,
   fields: readonly ResolvedField[],
-  tokenize: Tokenizer,
+  text: MeteredText,
   batch: BatchContext,
 ): void {
   const matches = runsByField(stream, fields).every(({ field, runs }) =>
-    fieldMatchesText(runs, resolveText(item, field.segments), tokenize, batch),
+    fieldMatchesText(runs, text.resolve(item, field.segments), text.tokenize, batch),
   );
   if (!matches) {
     throw invalidSnapshot('each record stream must match the tokens of its record text', recordIndex);
@@ -337,8 +357,9 @@ export function validateSnapshot(data: unknown, loadLimits: LoadLimits, hooks: P
   const pipeline = createPipeline(hooks, { kind: 'terms', terms: checkedStopTerms(parts.stopTerms) });
   const batch = surfaceBatch(parts.surfaces);
   const records = parts.records.map((record, recordIndex) => preparedRecord(record, recordIndex, options, batch));
+  const text = meteredText(pipeline.tokenize, loadLimits.maxTextLength);
   for (const [recordIndex, record] of records.entries()) {
-    checkRecordText(record, recordIndex, fields, pipeline.tokenize, batch);
+    checkRecordText(record, recordIndex, fields, text, batch);
   }
   if (referencedSurfaceCount(records, fields.length) !== batch.newSurfaces.length) {
     throw invalidSnapshot('every surface must be referenced by a record stream');
