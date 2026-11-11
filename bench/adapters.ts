@@ -175,7 +175,7 @@ const microFuzzy: LibraryAdapter = {
   name: 'uFuzzy',
   packageName: '@leeoniya/ufuzzy',
   settings:
-    'intraMode SingleError (1 insertion, substitution, transposition or deletion per term), terms in any order (up to 3 permuted), latinized haystack and needle, first 20 ranked results',
+    'intraMode SingleError (1 insertion, substitution, transposition or deletion per term), terms in any order (up to 3 permuted), latinized haystack and needle, ranked only when at most 1,000 records match (default infoThresh), first 20 results',
   build: (records) => {
     const finder = new uFuzzy({
       intraMode: intraMode(UFUZZY_SINGLE_ERROR_MODE),

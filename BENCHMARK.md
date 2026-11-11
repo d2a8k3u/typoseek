@@ -85,7 +85,7 @@ Each library runs with the settings closest to typoseek's defaults that it offer
 - Orama: `threshold: 0` (all terms), `tolerance` per query set to the largest typo budget of its terms (1 from 4, 2 from 8 letters), default prefix matching and diacritic replacement, limit 20.
 - FlexSearch: a `Document` over one field joining title, body and tag, because FlexSearch matches all query terms within one field; `tokenize: 'forward'` (prefix), encoder `LatinBalance` (diacritic and phonetic normalization, no edit distance), limit 20.
 - fuzzysort: a snapshot of the three keys, subsequence matching per space-separated term (no edit distance), default threshold, limit 20.
-- uFuzzy: `intraMode` SingleError (1 insertion, substitution, transposition or deletion per term), terms in any order (up to 3 permuted), latinized haystack and needle, first 20 ranked results.
+- uFuzzy: `intraMode` SingleError (1 insertion, substitution, transposition or deletion per term), terms in any order (up to 3 permuted), latinized haystack and needle, results ranked only when at most 1,000 records match (its default `infoThresh`), first 20 results.
 
 ## Run it
 
