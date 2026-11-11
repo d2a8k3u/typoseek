@@ -11,8 +11,7 @@ const fixtureSource = fileURLToPath(new URL('fixture', import.meta.url));
 const typescriptCompiler = createRequire(import.meta.url).resolve('typescript/bin/tsc');
 
 const DIST_DIRECTORY = 'dist/';
-const REQUIRED_ROOT_FILES = ['LICENSE', 'package.json'];
-const OPTIONAL_ROOT_FILES = ['README.md'];
+const REQUIRED_ROOT_FILES = ['LICENSE', 'README.md', 'package.json'];
 const RUNTIME_DEPENDENCY_FIELDS = ['dependencies', 'peerDependencies', 'optionalDependencies'];
 
 const INDEX_OPTIONS = { idKey: 'id', keys: ['title'] };
@@ -62,10 +61,9 @@ beforeAll(async () => {
 }, PACKED_INSTALL_TIMEOUT_MS);
 
 describe('packed typoseek tarball', { timeout: COMMAND_TIMEOUT_MS * 2 }, () => {
-  test('packs package.json, LICENSE, an optional README.md and dist only', () => {
-    const rootFiles = install.packedFiles.filter((file) => !file.startsWith(DIST_DIRECTORY));
-    const requiredRootFiles = rootFiles.filter((file) => !OPTIONAL_ROOT_FILES.includes(file)).sort();
-    expect(requiredRootFiles).toEqual(REQUIRED_ROOT_FILES);
+  test('packs package.json, LICENSE, README.md and dist only', () => {
+    const rootFiles = install.packedFiles.filter((file) => !file.startsWith(DIST_DIRECTORY)).sort();
+    expect(rootFiles).toEqual(REQUIRED_ROOT_FILES);
   });
 
   test('ships a package.json without runtime dependency fields', async () => {
