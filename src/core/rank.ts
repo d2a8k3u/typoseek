@@ -1,5 +1,5 @@
-export const BM25_K1 = 1.2;
-export const BM25_B = 0.75;
+const BM25_K1 = 1.2;
+const BM25_B = 0.75;
 
 export interface RankKey {
   readonly matchedClauses: number;

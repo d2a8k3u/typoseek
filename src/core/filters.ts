@@ -136,7 +136,7 @@ export function compileFilter<T>(
   return (item) => predicates.every((predicate) => predicate(item));
 }
 
-export type SortKey =
+type SortKey =
   | { readonly kind: 'number'; readonly value: number }
   | { readonly kind: 'string'; readonly value: string }
   | { readonly kind: 'boolean'; readonly value: boolean }

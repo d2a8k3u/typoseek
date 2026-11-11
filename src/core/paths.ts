@@ -1,4 +1,4 @@
-export const MAX_KEY_PATH_SEGMENTS = 5;
+const MAX_KEY_PATH_SEGMENTS = 5;
 
 export const KEY_PATH_RULE = `a dotted path of 1 to ${String(MAX_KEY_PATH_SEGMENTS)} non-empty segments, none of them __proto__, constructor or prototype`;
 
