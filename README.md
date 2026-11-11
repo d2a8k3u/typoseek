@@ -231,7 +231,7 @@ Going over any of them throws `SERIALIZED_INDEX_TOO_LARGE`. `stopWords` and `lim
 
 ## Limits
 
-Search input is capped. An input over a cap is rejected with a typed error, never cut silently.
+Search input is capped. A query over a cap is rejected with a typed error unless `truncateQuery` is set.
 
 - `limits.maxQueryLength`: default 256 code points, range 1 to 4096. Over it throws `QUERY_TOO_LONG`.
 - `limits.maxQueryTerms`: default 16 tokens, range 1 to 64. Over it throws `TOO_MANY_TERMS`.
