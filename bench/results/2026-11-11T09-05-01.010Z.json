@@ -1,0 +1,529 @@
+{
+  "measuredAt": "2026-11-11T09:05:01.010Z",
+  "command": "npm run bench",
+  "machine": {
+    "cpu": "Apple M4 Pro",
+    "logicalCores": 14,
+    "memoryBytes": 51539607552,
+    "os": "Darwin 27.3.0",
+    "osVersion": "Darwin Kernel Version 27.3.0: Fri Oct 30 02:03:07 PDT 2026; root:xnu-13432.60.57~99/RELEASE_ARM64_T6041",
+    "arch": "arm64",
+    "node": "v24.20.0"
+  },
+  "packages": {
+    "typoseek": "0.0.0",
+    "minisearch": "7.2.0",
+    "fuse.js": "7.5.0",
+    "@orama/orama": "3.1.18",
+    "flexsearch": "0.8.212",
+    "fuzzysort": "4.0.2",
+    "@leeoniya/ufuzzy": "1.0.19",
+    "tinybench": "6.2.3"
+  },
+  "dataset": {
+    "seed": 20261110,
+    "sizes": [
+      10000,
+      100000
+    ],
+    "queries": 200,
+    "warmupQueries": 20,
+    "buildRuns": 3
+  },
+  "percentiles": "nearest rank over one sample per query",
+  "libraries": [
+    {
+      "name": "typoseek",
+      "packageName": "typoseek",
+      "settings": "defaults: AND of all terms, 1 typo (OSA) from 4 and 2 typos from 8 code points, prefix and infix on the last term, diacritic folding, highlights, limit 20"
+    },
+    {
+      "name": "MiniSearch",
+      "packageName": "minisearch",
+      "settings": "combineWith AND, fuzzy 1 edit (Levenshtein) from 4 and 2 edits from 8 letters, prefix on the last term, processTerm foldTerm from typoseek, first 20 results"
+    },
+    {
+      "name": "Fuse",
+      "packageName": "fuse.js",
+      "settings": "useTokenSearch with tokenMatch all, threshold 0.25 (1 error per 4 letters), ignoreLocation, ignoreDiacritics, limit 20"
+    },
+    {
+      "name": "Orama",
+      "packageName": "@orama/orama",
+      "settings": "threshold 0 (all terms), tolerance per query = the largest typo budget of its terms (1 from 4, 2 from 8 letters), default prefix matching and diacritic replacement, limit 20"
+    },
+    {
+      "name": "FlexSearch",
+      "packageName": "flexsearch",
+      "settings": "Document over one field joining title, body and tag (FlexSearch matches all query terms within one field), tokenize forward (prefix), encoder LatinBalance (diacritic and phonetic normalization, no edit distance), limit 20"
+    },
+    {
+      "name": "fuzzysort",
+      "packageName": "fuzzysort",
+      "settings": "snapshot of the three keys, subsequence matching per space-separated term (no edit distance), default threshold, limit 20"
+    },
+    {
+      "name": "uFuzzy",
+      "packageName": "@leeoniya/ufuzzy",
+      "settings": "intraMode SingleError (1 insertion, substitution, transposition or deletion per term), terms in any order (up to 3 permuted), latinized haystack and needle, first 20 ranked results"
+    }
+  ],
+  "results": [
+    {
+      "library": "typoseek",
+      "size": 10000,
+      "buildMs": 135.34325,
+      "retainedHeapBytes": 28180616,
+      "retainedArrayBufferBytes": 230860,
+      "buildRuns": [
+        {
+          "buildMs": 135.678792,
+          "retainedHeapBytes": 28431936,
+          "retainedArrayBufferBytes": 230860
+        },
+        {
+          "buildMs": 135.34325,
+          "retainedHeapBytes": 28150816,
+          "retainedArrayBufferBytes": 219772
+        },
+        {
+          "buildMs": 134.077292,
+          "retainedHeapBytes": 28180616,
+          "retainedArrayBufferBytes": 230860
+        }
+      ],
+      "search": {
+        "samples": 200,
+        "p50Ms": 4.264167000000043,
+        "p95Ms": 8.411500000000046,
+        "meanMs": 4.380139624999999,
+        "maxMs": 10.89058399999999,
+        "queriesWithHits": 186
+      }
+    },
+    {
+      "library": "MiniSearch",
+      "size": 10000,
+      "buildMs": 65.60483299999987,
+      "retainedHeapBytes": 21001208,
+      "retainedArrayBufferBytes": 0,
+      "buildRuns": [
+        {
+          "buildMs": 66.401208,
+          "retainedHeapBytes": 20955648,
+          "retainedArrayBufferBytes": -58988
+        },
+        {
+          "buildMs": 64.91941699999984,
+          "retainedHeapBytes": 21006280,
+          "retainedArrayBufferBytes": 0
+        },
+        {
+          "buildMs": 65.60483299999987,
+          "retainedHeapBytes": 21001208,
+          "retainedArrayBufferBytes": 0
+        }
+      ],
+      "search": {
+        "samples": 200,
+        "p50Ms": 1.1153340000000753,
+        "p95Ms": 2.684332999999924,
+        "meanMs": 1.256638345,
+        "maxMs": 4.532166000000188,
+        "queriesWithHits": 173
+      }
+    },
+    {
+      "library": "Fuse",
+      "size": 10000,
+      "buildMs": 36.75770800000009,
+      "retainedHeapBytes": 13719344,
+      "retainedArrayBufferBytes": 0,
+      "buildRuns": [
+        {
+          "buildMs": 36.0669170000001,
+          "retainedHeapBytes": 13682584,
+          "retainedArrayBufferBytes": 0
+        },
+        {
+          "buildMs": 36.75770800000009,
+          "retainedHeapBytes": 13719344,
+          "retainedArrayBufferBytes": 0
+        },
+        {
+          "buildMs": 37.4562920000003,
+          "retainedHeapBytes": 13723224,
+          "retainedArrayBufferBytes": 0
+        }
+      ],
+      "search": {
+        "samples": 200,
+        "p50Ms": 100.87616699999853,
+        "p95Ms": 150.932208000002,
+        "meanMs": 103.87033537500002,
+        "maxMs": 182.9175410000007,
+        "queriesWithHits": 189
+      }
+    },
+    {
+      "library": "Orama",
+      "size": 10000,
+      "buildMs": 113.05441699999938,
+      "retainedHeapBytes": 37811976,
+      "retainedArrayBufferBytes": 0,
+      "buildRuns": [
+        {
+          "buildMs": 113.05441699999938,
+          "retainedHeapBytes": 38013368,
+          "retainedArrayBufferBytes": 0
+        },
+        {
+          "buildMs": 111.1149579999983,
+          "retainedHeapBytes": 37756368,
+          "retainedArrayBufferBytes": 0
+        },
+        {
+          "buildMs": 114.4933749999982,
+          "retainedHeapBytes": 37811976,
+          "retainedArrayBufferBytes": 0
+        }
+      ],
+      "search": {
+        "samples": 200,
+        "p50Ms": 15.449749999999767,
+        "p95Ms": 59.21674999999959,
+        "meanMs": 17.684376259999933,
+        "maxMs": 82.5221249999995,
+        "queriesWithHits": 121
+      }
+    },
+    {
+      "library": "FlexSearch",
+      "size": 10000,
+      "buildMs": 182.0952920000018,
+      "retainedHeapBytes": 59967000,
+      "retainedArrayBufferBytes": 0,
+      "buildRuns": [
+        {
+          "buildMs": 185.3559580000001,
+          "retainedHeapBytes": 60995840,
+          "retainedArrayBufferBytes": 0
+        },
+        {
+          "buildMs": 178.4474169999994,
+          "retainedHeapBytes": 59878976,
+          "retainedArrayBufferBytes": 0
+        },
+        {
+          "buildMs": 182.0952920000018,
+          "retainedHeapBytes": 59967000,
+          "retainedArrayBufferBytes": 0
+        }
+      ],
+      "search": {
+        "samples": 200,
+        "p50Ms": 0.004750000000058208,
+        "p95Ms": 0.25404100000014296,
+        "meanMs": 0.05058911000003719,
+        "maxMs": 0.4671669999988808,
+        "queriesWithHits": 50
+      }
+    },
+    {
+      "library": "fuzzysort",
+      "size": 10000,
+      "buildMs": 0.028374999998050043,
+      "retainedHeapBytes": 80888,
+      "retainedArrayBufferBytes": 0,
+      "buildRuns": [
+        {
+          "buildMs": 0.8644999999996799,
+          "retainedHeapBytes": 65168,
+          "retainedArrayBufferBytes": 0
+        },
+        {
+          "buildMs": 0.028374999998050043,
+          "retainedHeapBytes": 80888,
+          "retainedArrayBufferBytes": 0
+        },
+        {
+          "buildMs": 0.023083000000042375,
+          "retainedHeapBytes": 80888,
+          "retainedArrayBufferBytes": 0
+        }
+      ],
+      "search": {
+        "samples": 200,
+        "p50Ms": 1.8892500000001746,
+        "p95Ms": 4.306584000001749,
+        "meanMs": 2.177029814999877,
+        "maxMs": 9.555457999998907,
+        "queriesWithHits": 48
+      }
+    },
+    {
+      "library": "uFuzzy",
+      "size": 10000,
+      "buildMs": 2.8692919999994047,
+      "retainedHeapBytes": 1514840,
+      "retainedArrayBufferBytes": 0,
+      "buildRuns": [
+        {
+          "buildMs": 8.905041000001802,
+          "retainedHeapBytes": 1514840,
+          "retainedArrayBufferBytes": 0
+        },
+        {
+          "buildMs": 2.8692919999994047,
+          "retainedHeapBytes": 1476552,
+          "retainedArrayBufferBytes": 0
+        },
+        {
+          "buildMs": 2.7981670000008307,
+          "retainedHeapBytes": 1560560,
+          "retainedArrayBufferBytes": 0
+        }
+      ],
+      "search": {
+        "samples": 200,
+        "p50Ms": 1.9367500000007567,
+        "p95Ms": 7.693875000000844,
+        "meanMs": 3.076164960000224,
+        "maxMs": 24.62920899999881,
+        "queriesWithHits": 90
+      }
+    },
+    {
+      "library": "typoseek",
+      "size": 100000,
+      "buildMs": 867.1122920000053,
+      "retainedHeapBytes": 118507512,
+      "retainedArrayBufferBytes": 1132064,
+      "buildRuns": [
+        {
+          "buildMs": 910.7330000000002,
+          "retainedHeapBytes": 90583632,
+          "retainedArrayBufferBytes": 2297532
+        },
+        {
+          "buildMs": 807.9335829999982,
+          "retainedHeapBytes": 118507512,
+          "retainedArrayBufferBytes": 929204
+        },
+        {
+          "buildMs": 867.1122920000053,
+          "retainedHeapBytes": 118528256,
+          "retainedArrayBufferBytes": 1132064
+        }
+      ],
+      "search": {
+        "samples": 200,
+        "p50Ms": 13.158292000000074,
+        "p95Ms": 29.64862500000163,
+        "meanMs": 14.547114204999849,
+        "maxMs": 46.879875000005995,
+        "queriesWithHits": 186
+      }
+    },
+    {
+      "library": "MiniSearch",
+      "size": 100000,
+      "buildMs": 1056.7301660000012,
+      "retainedHeapBytes": 104184768,
+      "retainedArrayBufferBytes": 0,
+      "buildRuns": [
+        {
+          "buildMs": 1056.7301660000012,
+          "retainedHeapBytes": 103666744,
+          "retainedArrayBufferBytes": 0
+        },
+        {
+          "buildMs": 1057.1931669999976,
+          "retainedHeapBytes": 104188408,
+          "retainedArrayBufferBytes": 0
+        },
+        {
+          "buildMs": 953.4571250000008,
+          "retainedHeapBytes": 104184768,
+          "retainedArrayBufferBytes": 0
+        }
+      ],
+      "search": {
+        "samples": 200,
+        "p50Ms": 6.192541000003985,
+        "p95Ms": 31.801625000000058,
+        "meanMs": 10.411587279999841,
+        "maxMs": 63.303875000005064,
+        "queriesWithHits": 165
+      }
+    },
+    {
+      "library": "Fuse",
+      "size": 100000,
+      "buildMs": 394.2849580000038,
+      "retainedHeapBytes": 127719944,
+      "retainedArrayBufferBytes": 0,
+      "buildRuns": [
+        {
+          "buildMs": 430.8395410000012,
+          "retainedHeapBytes": 123000104,
+          "retainedArrayBufferBytes": 0
+        },
+        {
+          "buildMs": 394.2849580000038,
+          "retainedHeapBytes": 127719944,
+          "retainedArrayBufferBytes": 0
+        },
+        {
+          "buildMs": 377.73116599999776,
+          "retainedHeapBytes": 127721544,
+          "retainedArrayBufferBytes": 0
+        }
+      ],
+      "search": {
+        "samples": 200,
+        "p50Ms": 1028.7485000000015,
+        "p95Ms": 1546.175792000009,
+        "meanMs": 1056.9634624750013,
+        "maxMs": 1875.6100420000002,
+        "queriesWithHits": 188
+      }
+    },
+    {
+      "library": "Orama",
+      "size": 100000,
+      "buildMs": 1506.8243329999968,
+      "retainedHeapBytes": 243271088,
+      "retainedArrayBufferBytes": 0,
+      "buildRuns": [
+        {
+          "buildMs": 1465.9689159999834,
+          "retainedHeapBytes": 243402504,
+          "retainedArrayBufferBytes": 0
+        },
+        {
+          "buildMs": 1506.8243329999968,
+          "retainedHeapBytes": 243223184,
+          "retainedArrayBufferBytes": 0
+        },
+        {
+          "buildMs": 1588.1543749999837,
+          "retainedHeapBytes": 243271088,
+          "retainedArrayBufferBytes": 0
+        }
+      ],
+      "search": {
+        "samples": 200,
+        "p50Ms": 65.33404200000223,
+        "p95Ms": 5176.205332999991,
+        "meanMs": 687.7119656250006,
+        "maxMs": 6818.0366669999785,
+        "queriesWithHits": 143
+      }
+    },
+    {
+      "library": "FlexSearch",
+      "size": 100000,
+      "buildMs": 2104.4462500000373,
+      "retainedHeapBytes": 256164544,
+      "retainedArrayBufferBytes": 0,
+      "buildRuns": [
+        {
+          "buildMs": 1987.318499999994,
+          "retainedHeapBytes": 257400584,
+          "retainedArrayBufferBytes": 0
+        },
+        {
+          "buildMs": 2234.9637079999666,
+          "retainedHeapBytes": 256157792,
+          "retainedArrayBufferBytes": 0
+        },
+        {
+          "buildMs": 2104.4462500000373,
+          "retainedHeapBytes": 256164544,
+          "retainedArrayBufferBytes": 0
+        }
+      ],
+      "search": {
+        "samples": 200,
+        "p50Ms": 0.006290999997872859,
+        "p95Ms": 3.447875000012573,
+        "meanMs": 0.45017100500001106,
+        "maxMs": 5.599500000011176,
+        "queriesWithHits": 51
+      }
+    },
+    {
+      "library": "fuzzysort",
+      "size": 100000,
+      "buildMs": 0.12329099996713921,
+      "retainedHeapBytes": 801000,
+      "retainedArrayBufferBytes": 0,
+      "buildRuns": [
+        {
+          "buildMs": 3.2772920000134036,
+          "retainedHeapBytes": 784016,
+          "retainedArrayBufferBytes": 0
+        },
+        {
+          "buildMs": 0.11895799997728318,
+          "retainedHeapBytes": 801000,
+          "retainedArrayBufferBytes": 0
+        },
+        {
+          "buildMs": 0.12329099996713921,
+          "retainedHeapBytes": 801000,
+          "retainedArrayBufferBytes": 0
+        }
+      ],
+      "search": {
+        "samples": 200,
+        "p50Ms": 32.63937499996973,
+        "p95Ms": 61.39779199997429,
+        "meanMs": 34.89238102999892,
+        "maxMs": 109.39850000001024,
+        "queriesWithHits": 53
+      }
+    },
+    {
+      "library": "uFuzzy",
+      "size": 100000,
+      "buildMs": 28.126583000004757,
+      "retainedHeapBytes": 15568856,
+      "retainedArrayBufferBytes": 0,
+      "buildRuns": [
+        {
+          "buildMs": 28.126583000004757,
+          "retainedHeapBytes": 15568856,
+          "retainedArrayBufferBytes": 0
+        },
+        {
+          "buildMs": 27.886959000024945,
+          "retainedHeapBytes": 15504056,
+          "retainedArrayBufferBytes": 0
+        },
+        {
+          "buildMs": 28.53479200002039,
+          "retainedHeapBytes": 15576512,
+          "retainedArrayBufferBytes": 0
+        }
+      ],
+      "search": {
+        "samples": 200,
+        "p50Ms": 14.90662500000326,
+        "p95Ms": 69.0549170000013,
+        "meanMs": 29.137210219999538,
+        "maxMs": 151.33533300005365,
+        "queriesWithHits": 91
+      }
+    }
+  ],
+  "asyncSlices": {
+    "records": 100000,
+    "probe": "self-rescheduling setTimeout(0); a gap that grows the index is a commit slice, one that shrinks it a rollback slice, one before the first commit a preparation slice",
+    "longestPreparationGapMs": 31.58333400002448,
+    "longestCommitGapMs": 49.898707999964245,
+    "longestRollbackGapMs": 32.716709000000264,
+    "abortedAtRecords": 50000
+  }
+}
