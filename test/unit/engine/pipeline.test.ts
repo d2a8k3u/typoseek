@@ -6,6 +6,7 @@ import {
   type PipelineHooks,
   type ResolvedField,
 } from '../../../src/core/options.ts';
+import { createIndex } from '../../../src/engine/create-index.ts';
 import {
   createPipeline,
   isValidId,
@@ -23,7 +24,7 @@ import {
   type KeyedState,
   type Pipeline,
 } from '../../../src/engine/state.ts';
-import type { Normalizer } from '../../../src/types.ts';
+import type { Normalizer, PipelineOptions, SearchIndex, TokenSpan } from '../../../src/types.ts';
 
 const DEFAULT_HOOKS: PipelineHooks = { tokenize: undefined, normalize: undefined, stem: undefined };
 
@@ -264,6 +265,58 @@ describe('stream layout', () => {
       ['Red', 4],
     ]);
     expect(counting.calls).toEqual(['the', 'The', 'the', 'fox', 'red', 'Red']);
+  });
+});
+
+interface Note {
+  readonly id: number;
+  readonly text: string;
+}
+
+const NON_WHITESPACE_RUN = /\S+/g;
+
+function whitespaceTokens(text: string): TokenSpan[] {
+  return Array.from(text.matchAll(NON_WHITESPACE_RUN), (match) => ({
+    start: match.index,
+    end: match.index + match[0].length,
+  }));
+}
+
+function noteIndex(hooks: PipelineOptions, texts: readonly string[] = []): SearchIndex<Note> {
+  const index = createIndex<Note>({ idKey: 'id', keys: ['text'], ...hooks });
+  index.addAll(texts.map((text, position) => ({ id: position + 1, text })));
+  return index;
+}
+
+const brokenOnBad = ((term: string) => (term === 'bad' ? 7 : lettersOnly(term))) as unknown as Normalizer;
+
+describe('FR-14 pipeline hooks through the index', () => {
+  test.each([
+    ['a stemmer', { stem: (term: string) => (term === 'mice' ? 'mouse' : term) }, ['mice', 'cat'], 'mouse', [1], []],
+    ['a stop-word list', { stopWords: ['zebra'] }, ['fox', 'zebra fox'], 'zebra fox', [1, 2], [2]],
+    ['a tokenizer', { tokenize: whitespaceTokens }, ['C++', 'C#'], 'c++', [1], [1, 2]],
+  ])('%s changes which records match', (_, hooks, texts, query, idsWithHook, idsWithoutHook) => {
+    const idsOf = (index: SearchIndex<Note>): readonly number[] => index.search(query).hits.map((hit) => hit.item.id);
+
+    expect([idsOf(noteIndex(hooks, texts)), idsOf(noteIndex({}, texts))]).toEqual([idsWithHook, idsWithoutHook]);
+  });
+
+  test('runs a counting normalizer once per distinct surface, stop words included, across addAll and a later add', () => {
+    const counting = countingNormalizer();
+    const index = noteIndex({ normalize: counting.normalize, stopWords: ['the'] }, ['The fox, the Fox', 'fox']);
+
+    index.add({ id: 3, text: 'the fox owl' });
+
+    expect(counting.calls).toEqual(['the', 'The', 'fox', 'the', 'Fox', 'owl']);
+  });
+
+  test.each([
+    ['the normalizer', { normalize: brokenOnBad }],
+    ['the stemmer', { stem: brokenOnBad }],
+  ])('rejects a non-string result of %s on a query token with INVALID_PIPELINE_OUTPUT', (_, hooks) => {
+    const index = noteIndex(hooks, ['good']);
+
+    expect(() => index.search('good bad')).toThrow(typoseekError('INVALID_PIPELINE_OUTPUT'));
   });
 });
 

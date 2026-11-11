@@ -1,6 +1,7 @@
-import { describe, expect, test } from 'vitest';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 import { DEFAULT_LIMITS, resolveKeySpecs, type PipelineHooks } from '../../../src/core/options.ts';
-import { createPipeline, prepareRecord } from '../../../src/engine/prepare.ts';
+import { indexFromState, SLICE_BUDGET_MS } from '../../../src/engine/create-index.ts';
+import { createPipeline } from '../../../src/engine/prepare.ts';
 import {
   averageFieldLength,
   commitRecords,
@@ -14,7 +15,7 @@ import {
   type GramList,
   type KeyedState,
 } from '../../../src/engine/state.ts';
-import type { Id } from '../../../src/types.ts';
+import type { Id, SearchIndex } from '../../../src/types.ts';
 
 const DEFAULT_HOOKS: PipelineHooks = { tokenize: undefined, normalize: undefined, stem: undefined };
 
@@ -28,33 +29,15 @@ function keyedState(keys: readonly string[], stopWords: readonly string[] = []):
 }
 
 function addAll(state: KeyedState<unknown>, records: readonly unknown[]): void {
-  const batch = createBatch();
-  const prepared = records.map((record, index) => prepareRecord(state, record, index, batch, 'add'));
-  commitRecords(state, prepared, state.nextDocNum, batch);
-}
-
-function docNumOf(state: KeyedState<unknown>, id: Id): number {
-  const docNum = state.docNumById.get(id);
-  if (docNum === undefined) {
-    throw new Error('test fixture: id is not indexed');
-  }
-  return docNum;
+  indexFromState(state).addAll(records);
 }
 
 function remove(state: KeyedState<unknown>, id: Id): void {
-  const docNum = docNumOf(state, id);
-  pruneSurfaces(state, retractRecord(state, docNum));
-  state.docs.delete(docNum);
-  state.docNumById.delete(id);
+  indexFromState(state).remove(id);
 }
 
 function update(state: KeyedState<unknown>, record: unknown): void {
-  const batch = createBatch();
-  const prepared = prepareRecord(state, record, undefined, batch, 'update');
-  const docNum = docNumOf(state, prepared.id);
-  const retracted = retractRecord(state, docNum);
-  commitRecords(state, [prepared], docNum, batch);
-  pruneSurfaces(state, retracted);
+  indexFromState(state).update(record);
 }
 
 function surfaceTable(state: KeyedState<unknown>): readonly (readonly [string, number, string | undefined, number])[] {
@@ -448,6 +431,120 @@ describe('invariant violations', () => {
     expect(() => {
       run(keyedState(['title']));
     }).toThrow(INVARIANT_VIOLATION);
+  });
+});
+
+function indexedTables(state: KeyedState<unknown>): unknown {
+  const terms = [...state.surfaces.values()].flatMap(({ term }) => (term === undefined ? [] : [term]));
+  return {
+    docs: docTable(state),
+    docNumById: [...state.docNumById],
+    surfaces: surfaceTable(state),
+    terms: termTable(state, terms),
+    grams: gramTable(state.grams),
+    lengthSums: [...state.lengthSums],
+  };
+}
+
+function stateTables(state: KeyedState<unknown>): unknown {
+  return {
+    indexed: indexedTables(state),
+    allocation: [state.nextDocNum, state.nextSurfaceId, [...state.freeSurfaceIds]],
+  };
+}
+
+describe('an addAllAsync aborted during commit', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  test('rolls back to the indexed state before the run, with the gram invariant of a fresh build', async () => {
+    let now = 0;
+    vi.spyOn(Date, 'now').mockImplementation(() => {
+      now += SLICE_BUDGET_MS + 1;
+      return now;
+    });
+    const state = keyedState(['title']);
+    const index = indexFromState(state);
+    index.addAll(sharedGramRecords(0, 600));
+    const before = indexedTables(state);
+    const signal = {
+      get aborted() {
+        return state.docs.size === 602;
+      },
+    };
+
+    await expect(index.addAllAsync(sharedGramRecords(600, 3), { signal })).rejects.toEqual(
+      expect.objectContaining({ code: 'ABORTED' }),
+    );
+
+    expect(indexedTables(state)).toEqual(before);
+    expectGramInvariant(state);
+  });
+});
+
+describe('FR-10 typed rejections through the index', () => {
+  test.each<readonly [string, (index: SearchIndex<unknown>) => void, string, number | undefined]>([
+    [
+      'an add of an indexed id',
+      (index) => {
+        index.add({ id: 'b', title: 'cat' });
+      },
+      'DUPLICATE_ID',
+      0,
+    ],
+    [
+      'an addAll that repeats an id of the batch',
+      (index) => {
+        index.addAll([
+          { id: 'c', title: 'cat' },
+          { id: 'c', title: 'cow' },
+        ]);
+      },
+      'DUPLICATE_ID',
+      1,
+    ],
+    [
+      'an addAll whose last record is invalid',
+      (index) => {
+        index.addAll([{ id: 'c', title: 'cat owl' }, null]);
+      },
+      'INVALID_RECORD',
+      1,
+    ],
+    [
+      'an update of an unknown id',
+      (index) => {
+        index.update({ id: 'z', title: 'cat' });
+      },
+      'UNKNOWN_ID',
+      undefined,
+    ],
+    [
+      'a remove of an unknown id',
+      (index) => {
+        index.remove('z');
+      },
+      'UNKNOWN_ID',
+      undefined,
+    ],
+    [
+      'a remove of an invalid id',
+      (index) => {
+        index.remove('__proto__');
+      },
+      'INVALID_ID',
+      undefined,
+    ],
+  ])('rejects %s with its code and leaves the index unchanged', (_, run, code, recordIndex) => {
+    const state = stateWithTwoRecords();
+    const index = indexFromState(state);
+    const before = stateTables(state);
+
+    expect(() => {
+      run(index);
+    }).toThrow(expect.objectContaining({ name: 'TyposeekError', code, recordIndex }));
+    expect(stateTables(state)).toEqual(before);
   });
 });
 
