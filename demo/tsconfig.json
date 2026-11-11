@@ -1,0 +1,11 @@
+{
+  "extends": "../tsconfig.build.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM"],
+    "noEmit": true,
+    "paths": {
+      "typoseek": ["../src/index.ts"]
+    }
+  },
+  "include": ["*.ts"]
+}
