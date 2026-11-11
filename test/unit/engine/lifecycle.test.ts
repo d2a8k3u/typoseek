@@ -9,6 +9,7 @@ import {
   createState,
   FIELD_BREAK,
   GRAM_CHUNK_CAPACITY,
+  MAX_INFIX_TERM_LENGTH,
   MAX_SURFACE_ID,
   pruneSurfaces,
   retractRecord,
@@ -288,6 +289,20 @@ describe('gram lists', () => {
       che: 'preacher',
       her: 'preacher',
     });
+    expectGramInvariant(state);
+  });
+
+  test(`removes a term longer than ${String(MAX_INFIX_TERM_LENGTH)} code points without touching a list, since no list holds it`, () => {
+    const state = keyedState(['title']);
+    addAll(state, [
+      { id: 1, title: 'searcher' },
+      { id: 2, title: 'r'.repeat(MAX_INFIX_TERM_LENGTH + 1) },
+    ]);
+    const listedBeforeRemoval = gramTable(state.grams);
+
+    remove(state, 2);
+
+    expect(gramTable(state.grams)).toEqual(listedBeforeRemoval);
     expectGramInvariant(state);
   });
 
