@@ -103,6 +103,18 @@ test('a stop word inside a phrase holds the place of any one token', () => {
   expect(hitIds(response)).toEqual([1]);
 });
 
+test('a query ending in a stop word gives its last positive term no prefix or infix match', () => {
+  const records = [
+    { id: 1, text: 'cat' },
+    { id: 2, text: 'catalog' },
+    { id: 3, text: 'bobcat' },
+  ];
+  const options = { keys: ['text'], stopWords: ['the'] };
+
+  expect(hitIds(searchRecords(records, options, 'cat the'))).toEqual([1]);
+  expect(new Set(hitIds(searchRecords(records, options, 'cat')))).toEqual(new Set([1, 2, 3]));
+});
+
 test('a phrase matches inside one value of one key path, never across values or key paths', () => {
   const records = [
     { id: 1, title: 'red', tags: ['cherry pie'] },
