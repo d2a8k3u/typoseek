@@ -63,11 +63,11 @@ The libraries do not match the same records, so read latency next to how many of
 | fuzzysort  | 0.03                     | 0.1                     | 0.12                      | 0.8                      |
 | uFuzzy     | 3                        | 1.5                     | 28                        | 15.6                     |
 
-At 100,000 records typoseek retains 118.5 MB of heap, plus 1.13 MB in array buffers (its record token streams), which `heapUsed` does not count; the other libraries keep none. The median of the six other libraries is 116.0 MB, so typoseek misses its memory target, retained heap below that median, by 2.5 MB (2.2%).
+At 100,000 records typoseek retains 118.5 MB of heap, plus 1.13 MB in array buffers (its record token streams), which `heapUsed` does not count; the other libraries keep none. The median of the six other libraries is 116.0 MB, so typoseek misses its memory target, retained heap below that median, by 2.56 MB (2.2%).
 
 ## Async indexing
 
-While `addAllAsync` indexes 100,000 records, a self-rescheduling `setTimeout(0)` probe records the gaps between its callbacks. A gap in which the index grew held a commit slice, one before the first commit a preparation slice. A second run is aborted at 50,000 committed records; a gap in which the index shrank held a rollback slice.
+While `addAllAsync` indexes 100,000 records, a self-rescheduling `setTimeout(0)` probe records the gaps between its callbacks. A gap in which the index grew held a commit slice, one before the first commit a preparation slice. A second run is aborted once at least 50,000 records are committed; a gap in which the index shrank held a rollback slice.
 
 | Slice       | Longest gap ms |
 | ----------- | -------------- |
