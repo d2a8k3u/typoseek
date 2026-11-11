@@ -42,6 +42,8 @@ const INFIX_GROUP_STEM = `a${INFIX_QUERY.slice(0, 3)}a${INFIX_QUERY.slice(1)}`;
 
 const LETTERS_WITHOUT_INFIX_QUERY = 'abcdefghijklmnopqrstuv';
 
+const ADVERSARIAL_TOKEN_LETTERS = 4_096;
+
 const SHARED_GRAM_TERM_COUNT = 200_000;
 
 const MAX_ARRAY_LENGTH = 2 ** 32 - 1;
@@ -121,6 +123,34 @@ function infixGroup(): readonly BenchRecord[] {
     body: '',
     tag: '',
   }));
+}
+
+function seededLetters(length: number): string {
+  const random = mulberry32(SEED);
+  return Array.from({ length }, () => itemAt(LETTERS, Math.floor(random() * LETTERS.length))).join('');
+}
+
+function adversarialRecord(title: string, body = '', tag = ''): BenchRecord {
+  return { id: 'adversarial', title, body, tag };
+}
+
+function adversarialRecords(): readonly (readonly [name: string, record: BenchRecord])[] {
+  const longToken = seededLetters(ADVERSARIAL_TOKEN_LETTERS);
+  return [
+    [
+      'repeats, nested brackets and quotes and dash runs',
+      adversarialRecord(
+        `${'a'.repeat(DEFAULT_LIMITS.maxQueryLength)} ${'(["'.repeat(1_000)}`,
+        '-'.repeat(10_000),
+        '"'.repeat(1_000),
+      ),
+    ],
+    ['one 4,096-letter token', adversarialRecord(longToken)],
+    [
+      '26 tokens of one shared 4,096-letter prefix plus a letter',
+      adversarialRecord(Array.from(LETTERS, (letter) => `${longToken}${letter}`).join(' ')),
+    ],
+  ];
 }
 
 describe(
@@ -218,25 +248,22 @@ describe(
       expect(ms).toBeLessThan(ADVERSARIAL_BOUND_MS);
     });
 
-    test('indexes and removes an adversarial record of repeats, nested brackets and quotes and dash runs, each under 500 ms', () => {
-      const index = stressIndex();
-      const adversarial: BenchRecord = {
-        id: 'adversarial',
-        title: `${'a'.repeat(DEFAULT_LIMITS.maxQueryLength)} ${'(["'.repeat(1_000)}`,
-        body: '-'.repeat(10_000),
-        tag: '"'.repeat(1_000),
-      };
+    test.each(adversarialRecords())(
+      'indexes and removes an adversarial record of %s, each under 500 ms',
+      (_, adversarial) => {
+        const index = stressIndex();
 
-      const addMs = elapsedMs(() => {
-        index.add(adversarial);
-      });
-      const removeMs = elapsedMs(() => {
-        index.remove(adversarial.id);
-      });
+        const addMs = elapsedMs(() => {
+          index.add(adversarial);
+        });
+        const removeMs = elapsedMs(() => {
+          index.remove(adversarial.id);
+        });
 
-      expect.soft(addMs).toBeLessThan(ADVERSARIAL_BOUND_MS);
-      expect.soft(removeMs).toBeLessThan(ADVERSARIAL_BOUND_MS);
-    });
+        expect.soft(addMs).toBeLessThan(ADVERSARIAL_BOUND_MS);
+        expect.soft(removeMs).toBeLessThan(ADVERSARIAL_BOUND_MS);
+      },
+    );
   },
 );
 
