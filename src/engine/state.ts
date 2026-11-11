@@ -90,7 +90,7 @@ export function batchCode(position: number): number {
   return FIRST_BATCH_CODE - position;
 }
 
-function batchPosition(code: number): number {
+export function batchPosition(code: number): number {
   return FIRST_BATCH_CODE - code;
 }
 

@@ -1,1 +1,27 @@
-export {};
+export { loadIndex } from './serialize/load';
+export type {
+  AbortSignalLike,
+  AsyncAddOptions,
+  FieldMatch,
+  Filter,
+  Id,
+  IndexHit,
+  KeyPath,
+  Limits,
+  LoadLimits,
+  LoadOptions,
+  Normalizer,
+  PipelineFunctions,
+  Range,
+  RangeBounds,
+  SearchIndex,
+  SearchOptions,
+  SearchResponse,
+  SerializedIndex,
+  SortBy,
+  Stemmer,
+  TokenSpan,
+  Tokenizer,
+  TypoTolerance,
+  ValuePath,
+} from './types';
