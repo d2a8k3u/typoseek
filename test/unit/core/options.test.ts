@@ -105,15 +105,22 @@ describe('checkLimits', () => {
 });
 
 describe('resolveLoadLimits', () => {
-  const defaults = { maxRecords: 1_000_000, maxSurfaces: 5_000_000, maxTokens: 50_000_000, maxStopTerms: 10_000 };
+  const defaults = {
+    maxRecords: 1_000_000,
+    maxSurfaces: 5_000_000,
+    maxTokens: 50_000_000,
+    maxStopTerms: 10_000,
+    maxTextLength: 1_000_000_000,
+  };
 
   test.each([
     ['the defaults without load limits', undefined, defaults],
     ['a large integer with defaults for the rest', { maxTokens: 2 ** 53 }, { ...defaults, maxTokens: 2 ** 53 }],
+    ['a large maxTextLength', { maxTextLength: 2 ** 53 }, { ...defaults, maxTextLength: 2 ** 53 }],
     [
       'every lower bound',
-      { maxRecords: 1, maxSurfaces: 1, maxTokens: 1, maxStopTerms: 1 },
-      { maxRecords: 1, maxSurfaces: 1, maxTokens: 1, maxStopTerms: 1 },
+      { maxRecords: 1, maxSurfaces: 1, maxTokens: 1, maxStopTerms: 1, maxTextLength: 1 },
+      { maxRecords: 1, maxSurfaces: 1, maxTokens: 1, maxStopTerms: 1, maxTextLength: 1 },
     ],
   ])('accepts %s', (_label, partial, loadLimits) => {
     expect(resolveLoadLimits(partial)).toEqual(loadLimits);
@@ -125,6 +132,10 @@ describe('resolveLoadLimits', () => {
     ['maxSurfaces below 1', { maxSurfaces: 0 }, 'loadLimits.maxSurfaces'],
     ['maxTokens below 1', { maxTokens: 0 }, 'loadLimits.maxTokens'],
     ['maxStopTerms below 1', { maxStopTerms: 0 }, 'loadLimits.maxStopTerms'],
+    ['maxTextLength below 1', { maxTextLength: 0 }, 'loadLimits.maxTextLength'],
+    ['a maxTextLength that is not an integer', { maxTextLength: 1.5 }, 'loadLimits.maxTextLength'],
+    ['an infinite maxTextLength', { maxTextLength: Infinity }, 'loadLimits.maxTextLength'],
+    ['a maxTextLength that is not a number', { maxTextLength: '1000' }, 'loadLimits.maxTextLength'],
     ['an infinite limit', { maxRecords: Infinity }, 'loadLimits.maxRecords'],
   ])('rejects %s as INVALID_OPTION naming the option', (_label, partial, option) => {
     expect(() => resolveLoadLimits(partial)).toThrow(invalidOption(option));
@@ -226,7 +237,13 @@ describe('resolveLoadOptions', () => {
   test('resolves the hooks and the load limits', () => {
     expect(resolveLoadOptions({ normalize, loadLimits: { maxRecords: 10 } })).toEqual({
       hooks: { tokenize: undefined, normalize, stem: undefined },
-      loadLimits: { maxRecords: 10, maxSurfaces: 5_000_000, maxTokens: 50_000_000, maxStopTerms: 10_000 },
+      loadLimits: {
+        maxRecords: 10,
+        maxSurfaces: 5_000_000,
+        maxTokens: 50_000_000,
+        maxStopTerms: 10_000,
+        maxTextLength: 1_000_000_000,
+      },
     });
   });
 

@@ -80,6 +80,7 @@ export const DEFAULT_LOAD_LIMITS: LoadLimits = Object.freeze({
   maxSurfaces: 5_000_000,
   maxTokens: 50_000_000,
   maxStopTerms: 10_000,
+  maxTextLength: 1_000_000_000,
 });
 
 const POSITIVE_INTEGER: IntegerRange = { min: 1, max: Infinity };
@@ -89,6 +90,7 @@ const LOAD_LIMIT_RANGES: Readonly<Record<keyof LoadLimits, IntegerRange>> = {
   maxSurfaces: POSITIVE_INTEGER,
   maxTokens: POSITIVE_INTEGER,
   maxStopTerms: POSITIVE_INTEGER,
+  maxTextLength: POSITIVE_INTEGER,
 };
 
 export function resolveLoadLimits(partial: unknown): LoadLimits {

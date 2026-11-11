@@ -194,6 +194,7 @@ export interface LoadLimits {
   readonly maxSurfaces: number;
   readonly maxTokens: number;
   readonly maxStopTerms: number;
+  readonly maxTextLength: number;
 }
 
 /** @public */
