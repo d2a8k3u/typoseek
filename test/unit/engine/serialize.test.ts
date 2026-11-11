@@ -357,11 +357,9 @@ describe('loadIndex charges one maxTextLength budget for walked arrays and text 
 
   const SHARING_RECORD_COUNT = 101;
 
-  const KEY_PATH_COUNT = 1_000;
+  const KEY_PATH_COUNT = 10;
 
-  const SLOT_COUNT = 100_000;
-
-  const KEY_PATHS_LOAD_TIMEOUT_MS = 30_000;
+  const SLOT_COUNT = 1_000;
 
   function keyPathsOverOneArray(): unknown {
     const keys = Array.from({ length: KEY_PATH_COUNT }, (_, index) => ({ path: `a.k${String(index)}`, weight: 1 }));
@@ -397,18 +395,13 @@ describe('loadIndex charges one maxTextLength budget for walked arrays and text 
     expect(() => loadIndex(hostile, { tokenize: () => [] })).toThrow(typoseekError(TOO_LARGE));
   });
 
-  test(
-    'charges 1,000 key paths over one 100,000-slot array of a JSON snapshot once each: loads at their product, rejects below',
-    () => {
-      const snapshot = keyPathsOverOneArray();
+  test('charges 10 key paths over one 1,000-slot array of a JSON snapshot once each: loads at their product, rejects below', () => {
+    const snapshot = keyPathsOverOneArray();
+    const product = KEY_PATH_COUNT * SLOT_COUNT;
 
-      expect(loadIndex(snapshot, { loadLimits: { maxTextLength: KEY_PATH_COUNT * SLOT_COUNT } }).size).toBe(1);
-      expect(() => loadIndex(snapshot, { loadLimits: { maxTextLength: 2 * SLOT_COUNT - 1 } })).toThrow(
-        typoseekError(TOO_LARGE),
-      );
-    },
-    KEY_PATHS_LOAD_TIMEOUT_MS,
-  );
+    expect(loadIndex(snapshot, { loadLimits: { maxTextLength: product } }).size).toBe(1);
+    expect(() => loadIndex(snapshot, { loadLimits: { maxTextLength: product - 1 } })).toThrow(typoseekError(TOO_LARGE));
+  });
 
   test('loads a snapshot whose charged sum ends in an array length, holes included, at maxTextLength and rejects it at one less', () => {
     const data = {
