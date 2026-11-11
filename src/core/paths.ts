@@ -28,38 +28,58 @@ export function isArray(value: unknown): value is readonly unknown[] {
   return Array.isArray(value);
 }
 
-interface PendingValue {
-  readonly value: unknown;
+interface ArrayCursor {
+  readonly array: readonly unknown[];
+  readonly length: number;
   readonly depth: number;
+  nextIndex: number;
 }
+
+type ArrayLengthCharge = (arrayLength: number) => void;
+
+const CHARGE_NOTHING: ArrayLengthCharge = () => undefined;
 
 function collectLeaves<Leaf>(
   record: unknown,
   segments: readonly string[],
   toLeaf: (value: unknown) => Leaf | undefined,
+  chargeArrayLength: ArrayLengthCharge,
 ): readonly Leaf[] {
   const leaves: Leaf[] = [];
   const visitedArrays = new Set<readonly unknown[]>();
-  const pending: PendingValue[] = [{ value: record, depth: 0 }];
-  for (let next = pending.pop(); next !== undefined; next = pending.pop()) {
-    const { value, depth } = next;
-    if (isArray(value)) {
-      if (!visitedArrays.has(value)) {
-        visitedArrays.add(value);
-        for (let index = value.length - 1; index >= 0; index -= 1) {
-          pending.push({ value: value[index], depth });
-        }
+  const cursors: ArrayCursor[] = [];
+  const visit = (value: unknown, depth: number): void => {
+    let current = value;
+    let level = depth;
+    for (let segment = segments[level]; segment !== undefined && !isArray(current); segment = segments[level]) {
+      if (!isObjectRecord(current) || !Object.hasOwn(current, segment)) {
+        return;
       }
-      continue;
+      current = current[segment];
+      level += 1;
     }
-    const segment = segments[depth];
-    if (segment === undefined) {
-      const leaf = toLeaf(value);
+    if (!isArray(current)) {
+      const leaf = toLeaf(current);
       if (leaf !== undefined) {
         leaves.push(leaf);
       }
-    } else if (isObjectRecord(value) && Object.hasOwn(value, segment)) {
-      pending.push({ value: value[segment], depth: depth + 1 });
+    } else if (!visitedArrays.has(current)) {
+      visitedArrays.add(current);
+      const { length } = current;
+      chargeArrayLength(length);
+      cursors.push({ array: current, length, depth: level, nextIndex: 0 });
+    }
+  };
+  visit(record, 0);
+  for (let cursor = cursors.at(-1); cursor !== undefined; cursor = cursors.at(-1)) {
+    const index = cursor.nextIndex;
+    if (index >= cursor.length) {
+      cursors.pop();
+    } else {
+      cursor.nextIndex = index + 1;
+      if (Object.hasOwn(cursor.array, index)) {
+        visit(cursor.array[index], cursor.depth);
+      }
     }
   }
   return leaves;
@@ -73,7 +93,15 @@ function toText(value: unknown): string | undefined {
 }
 
 export function resolveText(record: unknown, segments: readonly string[]): readonly string[] {
-  return collectLeaves(record, segments, toText);
+  return collectLeaves(record, segments, toText, CHARGE_NOTHING);
+}
+
+export function resolveMeteredText(
+  record: unknown,
+  segments: readonly string[],
+  chargeArrayLength: ArrayLengthCharge,
+): readonly string[] {
+  return collectLeaves(record, segments, toText, chargeArrayLength);
 }
 
 export type ComparableValue = string | number | boolean | null | { readonly dateMs: number };
@@ -102,5 +130,5 @@ export function toComparableValue(value: unknown): ComparableValue | undefined {
 }
 
 export function resolveValues(record: unknown, segments: readonly string[]): readonly ComparableValue[] {
-  return collectLeaves(record, segments, toComparableValue);
+  return collectLeaves(record, segments, toComparableValue, CHARGE_NOTHING);
 }

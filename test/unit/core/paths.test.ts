@@ -1,6 +1,6 @@
 import { runInNewContext } from 'node:vm';
 import { describe, expect, test } from 'vitest';
-import { parseKeyPath, resolveText, resolveValues } from '../../../src/core/paths.ts';
+import { parseKeyPath, resolveMeteredText, resolveText, resolveValues } from '../../../src/core/paths.ts';
 
 describe('parseKeyPath', () => {
   test.each([
@@ -78,5 +78,36 @@ describe('resolveValues', () => {
 
   test('yields no value for an object that only claims to be a Date through Symbol.toStringTag', () => {
     expect(resolveValues({ at: { [Symbol.toStringTag]: 'Date' } }, ['at'])).toEqual([]);
+  });
+});
+
+describe('array holes', () => {
+  test.each([
+    ['resolveText', resolveText],
+    ['resolveValues', resolveValues],
+  ])('%s yields nothing for a hole, even when the array prototype carries that index', (_label, resolve) => {
+    const tags: unknown[] = [];
+    tags[0] = 'red';
+    tags[2] = 'green';
+    Object.setPrototypeOf(tags, Object.assign(Object.create(Array.prototype) as object, { 1: 'inherited' }));
+
+    expect(resolve({ tags }, ['tags'])).toEqual(['red', 'green']);
+  });
+});
+
+describe('resolveMeteredText', () => {
+  test('charges each array length, holes included, once per array and nothing for an array already visited', () => {
+    const inner: unknown[] = ['b'];
+    inner[2] = 'c';
+    const outer: unknown[] = ['a', inner];
+    outer.push(outer, inner);
+    const charges: number[] = [];
+
+    const texts = resolveMeteredText({ tags: outer }, ['tags'], (arrayLength) => {
+      charges.push(arrayLength);
+    });
+
+    expect(texts).toEqual(['a', 'b', 'c']);
+    expect(charges).toEqual([4, 3]);
   });
 });
