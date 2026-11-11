@@ -231,8 +231,12 @@ describe('loadIndex rejects a snapshot with a typed error', () => {
     ['a header that counts a stop surface', withStream(0, [3, 1, 0, 1, 2, FIELD_BREAK, 3]), 0],
     ['a surface index past the last surface', withStream(1, [1, 2, 4, FIELD_BREAK, 2, VALUE_BREAK, 3]), 1],
     ['a batch code', withStream(1, [1, 2, -3, FIELD_BREAK, 2, VALUE_BREAK, 3]), 1],
-    ['a missing FIELD_BREAK', withStream(1, [1, 2, 2, VALUE_BREAK, 2, VALUE_BREAK, 3]), 1],
-    ['an extra FIELD_BREAK', withStream(1, [1, 2, 2, FIELD_BREAK, 2, FIELD_BREAK, 3]), 1],
+    [
+      'a missing FIELD_BREAK',
+      withRecord(1, [{ id: 'b', title: ['fox', 'fox', 'den'] }, [3, 0, 2, VALUE_BREAK, 2, VALUE_BREAK, 3]]),
+      1,
+    ],
+    ['an extra FIELD_BREAK', withStream(1, [1, 1, 2, FIELD_BREAK, 2, FIELD_BREAK, 3]), 1],
   ])('with an invalid record: %s', (_, data, recordIndex) => {
     expect(() => loadIndex(data)).toThrow(typoseekError('INVALID_SERIALIZED_INDEX', recordIndex));
   });
