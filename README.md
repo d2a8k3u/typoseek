@@ -96,7 +96,7 @@ Passed to `index.search(query, options)` and to `search(items, query, options)`:
 - `infix`: default `true`. The last token of the query also matches inside words, see [Query syntax](#query-syntax).
 - `typos`: `false` turns typo tolerance off. Otherwise `{ minLengthForOne, minLengthForTwo }`, default `{ minLengthForOne: 4, minLengthForTwo: 8 }`. A query term of fewer than `minLengthForOne` code points matches exactly, from `minLengthForOne` it allows 1 edit, from `minLengthForTwo` it allows 2. Never more than 2 edits. The distance is optimal string alignment over code points, so two swapped adjacent letters are one edit. `minLengthForOne` is at least 1, `minLengthForTwo` is an integer not below `minLengthForOne`, or `Infinity`. Setting `minLengthForOne` above 8 alone throws `INVALID_OPTION` naming `typos.minLengthForTwo`, so set both.
 - `fold`: default `true`. Compares terms with case and diacritics folded. With `false`, every clause compares the original tokens, case and diacritic sensitive after NFC normalization, and highlights mark only tokens that matched that way.
-- `filter`: a predicate `(item) => boolean`, `{ key, equals }`, `{ key, range }`, or an array of them that must all hold. `equals` takes a string, number, boolean or `null`. `range` takes `gt`, `gte`, `lt` and `lte`, each a number or a `Date`.
+- `filter`: a predicate `(item) => boolean`, `{ key, equals }`, `{ key, range }`, or an array of them that must all hold. `equals` takes a string, a finite number, a boolean or `null`. `range` takes `gt`, `gte`, `lt` and `lte`, each a finite number or a valid `Date`.
 - `sortBy`: `{ key, direction }` with `direction` `'asc'` (default) or `'desc'`. Replaces relevance order; ties keep the original order.
 - `limit`: default 20, an integer from 0 to 1000. `offset`: default 0. `total` counts every match after filters, the page is the positions from `offset` to `offset + limit`.
 - `truncateQuery`: default `false`, see [Limits](#limits).
@@ -702,7 +702,7 @@ Numbers from one run of `npm run bench` on 2026-11-11: Apple M4 Pro, 14 logical 
 | 100,000 | Build time (ms)    | 867      | 726               |
 | 100,000 | Retained heap (MB) | 118.5    | 116.0             |
 
-Retained heap at 100,000 records is 2.56 MB (2.2%) above the competitor median, so typoseek does not reach its target of staying below it. It also keeps 1.13 MB in array buffers that `heapUsed` does not count.
+Retained heap at 100,000 records is 2.56 MB (2.2%) above the competitor median, so typoseek misses its memory target of staying below it. It also keeps 1.13 MB in array buffers that `heapUsed` does not count.
 
 The libraries do not return the same matches: at both sizes typoseek returned results for 186 of the 200 queries and the other libraries for 48 to 189. [BENCHMARK.md](BENCHMARK.md) has p50, every library, the settings each ran with and how to rerun it. While `addAllAsync` indexed 100,000 records, the longest gap between event loop callbacks was 31.6 ms in a preparation slice, 49.9 ms in a commit slice and 32.7 ms in a rollback slice on that machine.
 
