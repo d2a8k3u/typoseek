@@ -1,0 +1,5 @@
+[
+  { "name": "typoseek", "path": "dist/index.mjs", "gzip": true, "limit": "6 kB" },
+  { "name": "typoseek/serialize", "path": "dist/serialize.mjs", "gzip": true, "limit": "7.5 kB" },
+  { "name": "typoseek/segmenter", "path": "dist/segmenter.mjs", "gzip": true, "limit": "1 kB" }
+]

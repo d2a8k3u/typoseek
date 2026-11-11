@@ -1,0 +1,14 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "src/index.ts",
+    "src/serialize.ts",
+    "src/segmenter.ts",
+    "test/**",
+    "bench/**",
+    "examples/**",
+    "demo/main.ts",
+    "vitest.stryker.config.ts"
+  ],
+  "project": ["src/**", "test/**", "bench/**", "examples/**", "demo/**", "*.ts", "*.mjs"]
+}
