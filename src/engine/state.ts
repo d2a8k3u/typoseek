@@ -1,7 +1,7 @@
 import { invariantViolation } from '../core/errors';
 import { infixGrams } from '../core/expand';
 import type { ResolvedField } from '../core/options';
-import { compareTermRank, RadixTree } from '../core/radix-tree';
+import { codePointLength, compareTermRank, RadixTree } from '../core/radix-tree';
 import type { Id, Limits, Normalizer, Stemmer, Tokenizer } from '../types';
 
 export interface Pipeline {
@@ -38,6 +38,8 @@ export interface DocEntry<T> {
 }
 
 export const GRAM_CHUNK_CAPACITY = 512;
+
+export const MAX_INFIX_TERM_LENGTH = 64;
 
 export interface GramList {
   size: number;
@@ -188,10 +190,14 @@ function cutEvenly(entries: readonly TermEntry[]): TermEntry[][] {
   );
 }
 
+function listedGrams(term: string): readonly string[] {
+  return codePointLength(term) > MAX_INFIX_TERM_LENGTH ? [] : infixGrams(term);
+}
+
 function groupByGram(entries: readonly TermEntry[]): Map<string, TermEntry[]> {
   const groups = new Map<string, TermEntry[]>();
   for (const entry of entries) {
-    for (const gram of infixGrams(entry.term)) {
+    for (const gram of listedGrams(entry.term)) {
       const group = groups.get(gram);
       if (group === undefined) {
         groups.set(gram, [entry]);
@@ -273,7 +279,7 @@ function removeFromGramList(grams: Map<string, GramList>, gram: string, entry: T
 
 function removeFromGramLists(grams: Map<string, GramList>, deleted: readonly TermEntry[]): void {
   for (const entry of deleted) {
-    for (const gram of infixGrams(entry.term)) {
+    for (const gram of listedGrams(entry.term)) {
       removeFromGramList(grams, gram, entry);
     }
   }

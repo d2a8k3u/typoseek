@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'vitest';
+import { MAX_INFIX_TERM_LENGTH } from '../../../src/engine/state.ts';
 import type { SearchOptions } from '../../../src/types.ts';
 import { buildState, hitIds, searchRecords, searchState } from '../../support/engine.ts';
 
@@ -80,6 +81,28 @@ describe('FR-4 ranking', () => {
       ['infix disabled', 'cat', { infix: false }, []],
     ])('%s: %s', (_, query, options, ids) => {
       expect(new Set(hitIds(searchState(state, query, options)))).toEqual(new Set(ids));
+    });
+  });
+
+  describe(`infix matching skips a term longer than ${String(MAX_INFIX_TERM_LENGTH)} code points, which still matches exactly, by prefix and with a typo`, () => {
+    const astralLetter = '𐌰';
+    const termAtCap = `xabc${'y'.repeat(MAX_INFIX_TERM_LENGTH - 'xabc'.length - 1)}${astralLetter}`;
+    const termOverCap = `xdef${'y'.repeat(MAX_INFIX_TERM_LENGTH + 1 - 'xdef'.length)}`;
+    const typoPosition = 32;
+    const state = buildState(docs(termAtCap, termOverCap), TEXT_KEY);
+
+    test.each<readonly [string, string, readonly number[]]>([
+      ['an infix of a term of exactly the cap, astral letter included', 'abc', [1]],
+      ['an infix of a term one code point over the cap', 'def', []],
+      ['the term over the cap itself', termOverCap, [2]],
+      ['a prefix of the term over the cap', termOverCap.slice(0, typoPosition), [2]],
+      [
+        'the term over the cap with one typo',
+        `${termOverCap.slice(0, typoPosition)}z${termOverCap.slice(typoPosition + 1)}`,
+        [2],
+      ],
+    ])('%s', (_, query, ids) => {
+      expect(hitIds(searchState(state, query))).toEqual(ids);
     });
   });
 });
