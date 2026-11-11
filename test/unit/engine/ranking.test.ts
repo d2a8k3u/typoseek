@@ -34,6 +34,19 @@ describe('FR-4 ranking', () => {
     expect(hitIds(response)).toEqual([3, 2, 1]);
   });
 
+  test('a typo in the first character ranks below a typo in a later character at the same edit distance', () => {
+    const response = searchRecords(
+      [
+        { id: 1, text: 'blephants' },
+        { id: 2, text: 'elephamts' },
+      ],
+      TEXT_KEY,
+      'elephants',
+    );
+
+    expect(hitIds(response)).toEqual([2, 1]);
+  });
+
   test('(b) a record matching a rare term outranks records matching a common term', () => {
     const response = searchRecords(docs('common', 'common', 'common', 'rare'), TEXT_KEY, 'common rare', {
       mode: 'or',
