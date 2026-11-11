@@ -47,7 +47,9 @@ export async function installPackedPackage(fixtureSource: string): Promise<Packe
 }
 
 async function packTarball(destination: string): Promise<string> {
-  await withPackLock(() => runCommand('npm', ['pack', '--pack-destination', destination], { cwd: repositoryRoot }));
+  await withPackLock(() =>
+    runCommand('npm', ['pack', '--ignore-scripts=false', '--pack-destination', destination], { cwd: repositoryRoot }),
+  );
   const [tarball, ...extraTarballs] = (await readdir(destination)).filter((name) => name.endsWith('.tgz'));
   if (tarball === undefined || extraTarballs.length > 0) {
     throw new Error(`npm pack must leave exactly one tarball in ${destination}`);
