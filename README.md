@@ -1,5 +1,12 @@
 # typoseek
 
+[![npm version](https://img.shields.io/npm/v/typoseek.svg)](https://www.npmjs.com/package/typoseek)
+[![CI status](https://github.com/d2a8k3u/typoseek/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/d2a8k3u/typoseek/actions/workflows/ci.yml)
+[![bundle size](https://deno.bundlejs.com/badge?q=typoseek)](https://bundlejs.com/?q=typoseek)
+[![npm provenance](https://img.shields.io/badge/provenance-npm-blue.svg)](https://www.npmjs.com/package/typoseek)
+[![license](https://img.shields.io/npm/l/typoseek.svg)](LICENSE)
+[![coverage](https://img.shields.io/endpoint?url=https%3A%2F%2Fd2a8k3u.github.io%2Ftyposeek%2Fcoverage.json)](https://github.com/d2a8k3u/typoseek/actions/workflows/pages.yml)
+
 Typo-tolerant full-text search for arrays of strings and records, in memory, with no runtime dependencies. It finds `barclona` when you mean `Barcelona` and returns the matched ranges for highlighting. The package imports no Node built-ins.
 
 - Typo tolerance by edit distance, prefix and infix matching on the last query term, diacritic folding.
