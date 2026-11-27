@@ -1,15 +1,15 @@
 # typoseek
 
-![A search over 33 books: tolkein hobit finds The Hobbit by J. R. R. Tolkien despite two typos, meta finds The Metamorphosis by prefix, orwell -farm leaves out Animal Farm, and bronte finds Emily and Charlotte Brontë, with the matched words highlighted](docs/images/banner.gif)
+![A search over 33 books: tolkein hobit finds The Hobbit by J. R. R. Tolkien despite two typos, meta finds The Metamorphosis by prefix, orwell -farm leaves out Animal Farm, and bronte finds Emily and Charlotte Brontë, with the matched words highlighted](https://raw.githubusercontent.com/d2a8k3u/typoseek/main/docs/images/banner.gif)
 
 [![npm version](https://img.shields.io/npm/v/typoseek.svg)](https://www.npmjs.com/package/typoseek)
 [![CI status](https://github.com/d2a8k3u/typoseek/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/d2a8k3u/typoseek/actions/workflows/ci.yml)
 [![bundle size](https://deno.bundlejs.com/badge?q=typoseek)](https://bundlejs.com/?q=typoseek)
 [![npm provenance](https://img.shields.io/badge/provenance-npm-blue.svg)](https://www.npmjs.com/package/typoseek)
-[![license](https://img.shields.io/npm/l/typoseek.svg)](LICENSE)
+[![license](https://img.shields.io/npm/l/typoseek.svg)](https://github.com/d2a8k3u/typoseek/blob/main/LICENSE)
 [![coverage](https://img.shields.io/endpoint?url=https%3A%2F%2Fd2a8k3u.github.io%2Ftyposeek%2Fcoverage.json)](https://github.com/d2a8k3u/typoseek/actions/workflows/pages.yml)
 
-Typo-tolerant search on 10,000 to 100,000 records in the browser or in Node, with a [capped cost](docs/options.md#limits) per query, highlight ranges for every hit and diacritics folded by default: `barclona` finds `Barcelona`, `lodz` finds `Łódź`. No runtime dependencies and no Node built-ins.
+Typo-tolerant search on 10,000 to 100,000 records in the browser or in Node, with a [capped cost](https://github.com/d2a8k3u/typoseek/blob/main/docs/options.md#limits) per query, highlight ranges for every hit and diacritics folded by default: `barclona` finds `Barcelona`, `lodz` finds `Łódź`. No runtime dependencies and no Node built-ins.
 
 Try it in the [live demo](https://d2a8k3u.github.io/typoseek/).
 
@@ -33,9 +33,9 @@ Try it in the [live demo](https://d2a8k3u.github.io/typoseek/).
 | Search p95, 100,000 records                       | 28.89 ms                              | 28.93 ms                    | 1,505.01 ms                 | 5,141.67 ms                    | 61.41 ms         | 66.62 ms                            |
 | Queries with at least one hit, of 200, at 100,000 | 186                                   | 165                         | 188                         | 143                            | 53               | 91                                  |
 
-Versions are MiniSearch 7.2.0, Fuse 7.5.0, Orama 3.1.18, fuzzysort 4.0.2 and uFuzzy 1.0.19. Sizes are from bundlejs on 2026-11-27. Timings and hit counts are from one run of `npm run bench` on an Apple M4 Pro, each library set as close to typoseek's defaults as it allows. At 10,000 records MiniSearch, fuzzysort and uFuzzy answer faster, and typoseek is the second largest bundle. It also builds slower and holds more heap than the benchmark median. [BENCHMARK.md](BENCHMARK.md) has the machine, the dataset, build times, heap and how to rerun it.
+Versions are MiniSearch 7.2.0, Fuse 7.5.0, Orama 3.1.18, fuzzysort 4.0.2 and uFuzzy 1.0.19. Sizes are from bundlejs on 2026-11-27. Timings and hit counts are from one run of `npm run bench` on an Apple M4 Pro, each library set as close to typoseek's defaults as it allows. At 10,000 records MiniSearch, fuzzysort and uFuzzy answer faster, and typoseek is the second largest bundle. It also builds slower and holds more heap than the benchmark median. [BENCHMARK.md](https://github.com/d2a8k3u/typoseek/blob/main/BENCHMARK.md) has the machine, the dataset, build times, heap and how to rerun it.
 
-Coming from Fuse, MiniSearch or match-sorter? [Migration](docs/migration.md) runs the same query through both libraries.
+Coming from Fuse, MiniSearch or match-sorter? [Migration](https://github.com/d2a8k3u/typoseek/blob/main/docs/migration.md) runs the same query through both libraries.
 
 ## Install
 
@@ -125,15 +125,15 @@ sao paolo ["São Paulo"] [[0,3],[4,9]]
 kralove ["Hradec Králové"] [[7,14]]
 ```
 
-Japanese, Chinese, Thai and other languages written without spaces need the [segmenter tokenizer](docs/pipeline.md#segmenter).
+Japanese, Chinese, Thai and other languages written without spaces need the [segmenter tokenizer](https://github.com/d2a8k3u/typoseek/blob/main/docs/pipeline.md#segmenter).
 
 ## Documentation
 
-- [Options](docs/options.md): index, search and load options, and the caps on queries.
-- [Query syntax and ranking](docs/query-and-ranking.md): phrases, negation, prefix and infix rules, the ranking order and how terms are folded.
-- [Errors](docs/errors.md): every error code and what a rejected call leaves in the index.
-- [Indexed records and serialization](docs/serialization.md): snapshots, `loadIndex` and a worker recipe.
-- [Segmenter and custom pipeline](docs/pipeline.md): `Intl.Segmenter` tokenizing and your own tokenizer, normalizer and stemmer.
-- [Migration](docs/migration.md): from Fuse, MiniSearch and match-sorter.
-- [API reference](docs/api.md): every export, by entry point.
-- [Benchmark](BENCHMARK.md): every library, its settings and how to rerun it.
+- [Options](https://github.com/d2a8k3u/typoseek/blob/main/docs/options.md): index, search and load options, and the caps on queries.
+- [Query syntax and ranking](https://github.com/d2a8k3u/typoseek/blob/main/docs/query-and-ranking.md): phrases, negation, prefix and infix rules, the ranking order and how terms are folded.
+- [Errors](https://github.com/d2a8k3u/typoseek/blob/main/docs/errors.md): every error code and what a rejected call leaves in the index.
+- [Indexed records and serialization](https://github.com/d2a8k3u/typoseek/blob/main/docs/serialization.md): snapshots, `loadIndex` and a worker recipe.
+- [Segmenter and custom pipeline](https://github.com/d2a8k3u/typoseek/blob/main/docs/pipeline.md): `Intl.Segmenter` tokenizing and your own tokenizer, normalizer and stemmer.
+- [Migration](https://github.com/d2a8k3u/typoseek/blob/main/docs/migration.md): from Fuse, MiniSearch and match-sorter.
+- [API reference](https://github.com/d2a8k3u/typoseek/blob/main/docs/api.md): every export, by entry point.
+- [Benchmark](https://github.com/d2a8k3u/typoseek/blob/main/BENCHMARK.md): every library, its settings and how to rerun it.
