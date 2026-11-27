@@ -1,21 +1,23 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, test, vi } from 'vitest';
+import { readDocumentation } from '../support/documentation.ts';
 
 const EXAMPLES_DIRECTORY = fileURLToPath(new URL('../../examples/', import.meta.url));
-const README_FILE = fileURLToPath(new URL('../../README.md', import.meta.url));
 const FENCED_BLOCK = /^```(\w*)\n([\s\S]*?)^```$/gm;
 const EXAMPLE_FILE_SUFFIX = '.ts';
 const TYPESCRIPT_FENCE = 'ts';
 const OUTPUT_FENCE = 'text';
 
 interface FencedBlock {
+  readonly path: string;
   readonly language: string;
   readonly content: string;
 }
 
-function readFencedBlocks(markdown: string): readonly FencedBlock[] {
+function readFencedBlocks(path: string, markdown: string): readonly FencedBlock[] {
   return Array.from(markdown.matchAll(FENCED_BLOCK), (match) => ({
+    path,
     language: match[1] ?? '',
     content: (match[2] ?? '').trimEnd(),
   }));
@@ -32,12 +34,22 @@ function exampleSource(name: string): string {
   return readFileSync(`${EXAMPLES_DIRECTORY}${name}${EXAMPLE_FILE_SUFFIX}`, 'utf8').trimEnd();
 }
 
-const blocks = readFencedBlocks(readFileSync(README_FILE, 'utf8'));
+function isExampleBlock(block: FencedBlock, source: string): boolean {
+  return block.language === TYPESCRIPT_FENCE && block.content === source;
+}
+
+const blocksPerFile = readDocumentation().map((file) => readFencedBlocks(file.path, file.markdown));
+const blocks = blocksPerFile.flat();
 const names = exampleNames();
 
-function readmeBlockIndex(name: string): number {
-  const source = exampleSource(name);
-  return blocks.findIndex((block) => block.language === TYPESCRIPT_FENCE && block.content === source);
+function blockAfterExample(source: string): FencedBlock | undefined {
+  for (const fileBlocks of blocksPerFile) {
+    const index = fileBlocks.findIndex((block) => isExampleBlock(block, source));
+    if (index !== -1) {
+      return fileBlocks[index + 1];
+    }
+  }
+  return undefined;
 }
 
 async function runExample(name: string): Promise<string> {
@@ -54,7 +66,7 @@ afterEach(() => {
   vi.resetModules();
 });
 
-describe('README code blocks', () => {
+describe('Code blocks in the README and docs/', () => {
   test('every ts block equals one file in examples', () => {
     const sources = new Set(names.map(exampleSource));
     const tsBlocks = blocks.filter((block) => block.language === TYPESCRIPT_FENCE);
@@ -62,15 +74,13 @@ describe('README code blocks', () => {
     expect(tsBlocks.filter((block) => !sources.has(block.content))).toEqual([]);
   });
 
-  test.each(names)('examples/%s.ts is in the README once', (name) => {
+  test.each(names)('examples/%s.ts appears once across the README and docs/', (name) => {
     const source = exampleSource(name);
-    const occurrences = blocks.filter((block) => block.language === TYPESCRIPT_FENCE && block.content === source);
-    expect(occurrences).toHaveLength(1);
+    expect(blocks.filter((block) => isExampleBlock(block, source))).toHaveLength(1);
   });
 
-  test.each(names)('examples/%s.ts prints the output that follows it in the README', async (name) => {
-    const index = readmeBlockIndex(name);
-    const documented = blocks[index + 1];
+  test.each(names)('examples/%s.ts prints the output that follows it in the same file', async (name) => {
+    const documented = blockAfterExample(exampleSource(name));
     expect(documented?.language).toBe(OUTPUT_FENCE);
     expect(await runExample(name)).toBe(documented?.content);
   });

@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 import { describe, expect, test } from 'vitest';
+import { readDocumentation } from '../support/documentation.ts';
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const ENTRIES = ['src/index.ts', 'src/serialize.ts', 'src/segmenter.ts'];
@@ -32,10 +33,10 @@ const program = ts.createProgram(
   ENTRIES.map((entry) => `${ROOT}${entry}`),
   compilerOptions(),
 );
-const documented = inlineCodeSpans(readFileSync(`${ROOT}README.md`, 'utf8'));
+const documented = new Set(readDocumentation().flatMap((file) => [...inlineCodeSpans(file.markdown)]));
 
-describe('README API reference', () => {
-  test.each(ENTRIES)('%s: every export appears in the README as inline code', (entry) => {
+describe('API reference', () => {
+  test.each(ENTRIES)('%s: every export appears in the README or docs/ as inline code', (entry) => {
     const names = exportedNames(entry, program);
     expect(names.length).toBeGreaterThan(0);
     expect(names.filter((name) => !documented.has(name))).toEqual([]);
