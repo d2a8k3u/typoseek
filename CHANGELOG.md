@@ -1,5 +1,11 @@
 # typoseek
 
+## 0.1.1
+
+### Patch Changes
+
+- The README compares typoseek with other libraries, shows a banner and links the reference in `docs/` on GitHub.
+
 ## 0.1.0
 
 ### Minor Changes
