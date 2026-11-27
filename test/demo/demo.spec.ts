@@ -21,7 +21,7 @@ test('axe reports no violations on the initial page and after a search', async (
 test('keyboard only: Tab reaches the input, typing updates the results and the live region', async ({ page }) => {
   const input = page.getByLabel('Search books');
   const status = page.getByRole('status');
-  await expect(status).toHaveText('24 results, showing the first 10');
+  await expect(status).toHaveText('33 results, showing the first 10');
 
   await page.keyboard.press('Tab');
   await expect(input).toBeFocused();
@@ -33,4 +33,21 @@ test('keyboard only: Tab reaches the input, typing updates the results and the l
   await expect(results).toHaveCount(1);
   await expect(results.first()).toContainText('The Hobbit');
   await expect(results.first().locator('mark')).toHaveText('Hobbit');
+});
+
+test('a query without accents finds authors in other languages and marks the accented words', async ({ page }) => {
+  const input = page.getByLabel('Search books');
+  const results = page.getByRole('listitem');
+
+  await input.fill('capek');
+  await expect(results).toHaveCount(2);
+  await expect(results.locator('mark')).toHaveText(['Čapek', 'Čapek']);
+
+  await input.fill('hoeg');
+  await expect(results).toHaveCount(1);
+  await expect(results.first().locator('mark')).toHaveText('Høeg');
+
+  await input.fill('boleslaw');
+  await expect(results).toHaveCount(1);
+  await expect(results.first().locator('mark')).toHaveText('Bolesław');
 });

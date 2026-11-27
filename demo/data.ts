@@ -29,4 +29,13 @@ export const books: readonly Book[] = [
   { id: 22, title: 'The Master and Margarita', author: 'Mikhail Bulgakov' },
   { id: 23, title: 'One Hundred Years of Solitude', author: 'Gabriel García Márquez' },
   { id: 24, title: 'Foundation', author: 'Isaac Asimov' },
+  { id: 25, title: 'Babička', author: 'Božena Němcová' },
+  { id: 26, title: 'Krakatit', author: 'Karel Čapek' },
+  { id: 27, title: 'Válka s mloky', author: 'Karel Čapek' },
+  { id: 28, title: 'Le Père Goriot', author: 'Honoré de Balzac' },
+  { id: 29, title: 'Lalka', author: 'Bolesław Prus' },
+  { id: 30, title: 'Röda rummet', author: 'August Strindberg' },
+  { id: 31, title: 'Frøken Smillas fornemmelse for sne', author: 'Peter Høeg' },
+  { id: 32, title: 'Ťapákovci', author: 'Božena Slančíková-Timrava' },
+  { id: 33, title: 'Die Blechtrommel', author: 'Günter Grass' },
 ];
