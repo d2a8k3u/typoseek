@@ -38,7 +38,7 @@ CI also runs two suites that need extra tools on your machine:
 ## What a pull request needs
 
 - A bug fix comes with a test that fails without the fix.
-- A change to the public API comes with the reports from `npm run api:update` in `etc/`. Every export must appear in the README as inline code, and `test/docs` fails when one is missing.
-- A new file in `examples/` appears in the README once, followed by the output it prints. `test/docs` runs it and compares.
+- A change to the public API comes with the reports from `npm run api:update` in `etc/`. Every export must appear as inline code in the README or a page in `docs/`, and `test/docs` fails when one is missing.
+- A new file in `examples/` appears once in the README or a page in `docs/`, followed by the output it prints. `test/docs` runs it and compares.
 - A change users notice needs a changeset. Run `npx changeset`, pick the version bump and describe the change in one line for the changelog.
 - Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/): `type(scope): summary`.
