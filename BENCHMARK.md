@@ -1,6 +1,6 @@
 # Benchmark
 
-Search latency, build time, retained heap and async indexing slices of typoseek next to six fuzzy search libraries, all from one run of `npm run bench` on 2026-11-11. The raw numbers are in [`bench/results/2026-11-11T09-05-01.010Z.json`](bench/results/2026-11-11T09-05-01.010Z.json).
+Search latency, build time, retained heap and async indexing slices of typoseek next to six fuzzy search libraries, all from one run of `npm run bench` on 2026-11-27. The raw numbers are in [`bench/results/2026-11-27T13-12-10.615Z.json`](bench/results/2026-11-27T13-12-10.615Z.json).
 
 ## Machine and versions
 
@@ -10,7 +10,7 @@ Search latency, build time, retained heap and async indexing slices of typoseek 
 | Memory                      | 48 GiB                         |
 | OS                          | Darwin 27.3.0 (macOS), arm64   |
 | Node                        | v24.20.0                       |
-| typoseek                    | 0.0.0                          |
+| typoseek                    | 0.1.0                          |
 | MiniSearch                  | 7.2.0                          |
 | Fuse (`fuse.js`)            | 7.5.0                          |
 | Orama (`@orama/orama`)      | 3.1.18                         |
@@ -31,13 +31,13 @@ Each library builds its index 3 times; build time and retained heap are the medi
 
 | Library    | p95 ms, 10,000 records | p50 ms, 10,000 records | p95 ms, 100,000 records | p50 ms, 100,000 records |
 | ---------- | ---------------------- | ---------------------- | ----------------------- | ----------------------- |
-| typoseek   | 8.41                   | 4.26                   | 29.65                   | 13.16                   |
-| MiniSearch | 2.68                   | 1.12                   | 31.80                   | 6.19                    |
-| Fuse       | 150.93                 | 100.88                 | 1,546.18                | 1,028.75                |
-| Orama      | 59.22                  | 15.45                  | 5,176.21                | 65.33                   |
-| FlexSearch | 0.25                   | 0.005                  | 3.45                    | 0.006                   |
-| fuzzysort  | 4.31                   | 1.89                   | 61.40                   | 32.64                   |
-| uFuzzy     | 7.69                   | 1.94                   | 69.05                   | 14.91                   |
+| typoseek   | 7.48                   | 3.85                   | 28.89                   | 11.92                   |
+| MiniSearch | 2.29                   | 1.07                   | 28.93                   | 5.17                    |
+| Fuse       | 150.29                 | 98.37                  | 1,505.01                | 1,001.43                |
+| Orama      | 58.24                  | 14.67                  | 5,141.67                | 58.32                   |
+| FlexSearch | 0.24                   | 0.005                  | 3.60                    | 0.007                   |
+| fuzzysort  | 4.31                   | 1.94                   | 61.41                   | 32.17                   |
+| uFuzzy     | 7.32                   | 1.75                   | 66.62                   | 14.30                   |
 
 The libraries do not match the same records, so read latency next to how many of the 200 queries returned at least one result:
 
@@ -55,15 +55,15 @@ The libraries do not match the same records, so read latency next to how many of
 
 | Library    | Build ms, 10,000 records | Heap MB, 10,000 records | Build ms, 100,000 records | Heap MB, 100,000 records |
 | ---------- | ------------------------ | ----------------------- | ------------------------- | ------------------------ |
-| typoseek   | 135                      | 28.2                    | 867                       | 118.5                    |
-| MiniSearch | 66                       | 21.0                    | 1,057                     | 104.2                    |
-| Fuse       | 37                       | 13.7                    | 394                       | 127.7                    |
-| Orama      | 113                      | 37.8                    | 1,507                     | 243.3                    |
-| FlexSearch | 182                      | 60.0                    | 2,104                     | 256.2                    |
-| fuzzysort  | 0.03                     | 0.1                     | 0.12                      | 0.8                      |
+| typoseek   | 124                      | 28.2                    | 852                       | 118.5                    |
+| MiniSearch | 66                       | 21.0                    | 892                       | 104.2                    |
+| Fuse       | 35                       | 13.7                    | 351                       | 127.7                    |
+| Orama      | 111                      | 37.8                    | 1,541                     | 243.2                    |
+| FlexSearch | 202                      | 60.0                    | 2,171                     | 256.2                    |
+| fuzzysort  | 0.03                     | 0.1                     | 0.14                      | 0.8                      |
 | uFuzzy     | 3                        | 1.5                     | 28                        | 15.6                     |
 
-At 100,000 records typoseek retains 118.5 MB of heap, plus 1.13 MB in array buffers (its record token streams), which `heapUsed` does not count; the other libraries keep none. The median of the six other libraries is 116.0 MB, so typoseek misses its memory target, retained heap below that median, by 2.56 MB (2.2%).
+At 100,000 records typoseek retains 118.5 MB of heap, plus 1.07 MB in array buffers (its record token streams), which `heapUsed` does not count; the other libraries keep none. The median of the six other libraries is 116.0 MB, so typoseek misses its memory target, retained heap below that median, by 2.56 MB (2.2%).
 
 ## Async indexing
 
@@ -71,9 +71,9 @@ While `addAllAsync` indexes 100,000 records, a self-rescheduling `setTimeout(0)`
 
 | Slice       | Longest gap ms |
 | ----------- | -------------- |
-| Preparation | 31.6           |
-| Commit      | 49.9           |
-| Rollback    | 32.7           |
+| Preparation | 29.0           |
+| Commit      | 60.2           |
+| Rollback    | 39.3           |
 
 ## Library settings
 
