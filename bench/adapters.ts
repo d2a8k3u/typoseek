@@ -117,7 +117,7 @@ const orama: LibraryAdapter = {
   name: 'Orama',
   packageName: '@orama/orama',
   settings:
-    'threshold 0 (all terms), tolerance per query = the largest typo budget of its terms (1 from 4, 2 from 8 letters), default prefix matching and diacritic replacement, limit 20',
+    'threshold 0 (all terms), tolerance per query = the largest typo budget of its terms (1 from 4, 2 from 8 letters), default prefix matching, the default English tokenizer (folds é, splits words at á, ř or ž), limit 20',
   build: (records) => {
     const db = create({ schema: { title: 'string', body: 'string', tag: 'string' } as const });
     const inserted = insertMultiple(db, [...records]);
