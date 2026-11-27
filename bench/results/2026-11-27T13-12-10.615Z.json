@@ -1,5 +1,5 @@
 {
-  "measuredAt": "2026-11-11T09:05:01.010Z",
+  "measuredAt": "2026-11-27T13:12:10.615Z",
   "command": "npm run bench",
   "machine": {
     "cpu": "Apple M4 Pro",
@@ -11,7 +11,7 @@
     "node": "v24.20.0"
   },
   "packages": {
-    "typoseek": "0.0.0",
+    "typoseek": "0.1.0",
     "minisearch": "7.2.0",
     "fuse.js": "7.5.0",
     "@orama/orama": "3.1.18",
@@ -65,455 +65,455 @@
     {
       "name": "uFuzzy",
       "packageName": "@leeoniya/ufuzzy",
-      "settings": "intraMode SingleError (1 insertion, substitution, transposition or deletion per term), terms in any order (up to 3 permuted), latinized haystack and needle, first 20 ranked results"
+      "settings": "intraMode SingleError (1 insertion, substitution, transposition or deletion per term), terms in any order (up to 3 permuted), latinized haystack and needle, ranked only when at most 1,000 records match (default infoThresh), first 20 results"
     }
   ],
   "results": [
     {
       "library": "typoseek",
       "size": 10000,
-      "buildMs": 135.34325,
-      "retainedHeapBytes": 28180616,
+      "buildMs": 123.99383399999999,
+      "retainedHeapBytes": 28179664,
       "retainedArrayBufferBytes": 230860,
       "buildRuns": [
         {
-          "buildMs": 135.678792,
-          "retainedHeapBytes": 28431936,
+          "buildMs": 128.32745799999998,
+          "retainedHeapBytes": 28439456,
           "retainedArrayBufferBytes": 230860
         },
         {
-          "buildMs": 135.34325,
-          "retainedHeapBytes": 28150816,
-          "retainedArrayBufferBytes": 219772
+          "buildMs": 123.99383399999999,
+          "retainedHeapBytes": 28151704,
+          "retainedArrayBufferBytes": 230860
         },
         {
-          "buildMs": 134.077292,
-          "retainedHeapBytes": 28180616,
+          "buildMs": 120.06870800000002,
+          "retainedHeapBytes": 28179664,
           "retainedArrayBufferBytes": 230860
         }
       ],
       "search": {
         "samples": 200,
-        "p50Ms": 4.264167000000043,
-        "p95Ms": 8.411500000000046,
-        "meanMs": 4.380139624999999,
-        "maxMs": 10.89058399999999,
+        "p50Ms": 3.852540999999974,
+        "p95Ms": 7.475750000000062,
+        "meanMs": 3.8962245949999987,
+        "maxMs": 11.407457999999906,
         "queriesWithHits": 186
       }
     },
     {
       "library": "MiniSearch",
       "size": 10000,
-      "buildMs": 65.60483299999987,
-      "retainedHeapBytes": 21001208,
+      "buildMs": 65.97191600000019,
+      "retainedHeapBytes": 21001560,
       "retainedArrayBufferBytes": 0,
       "buildRuns": [
         {
-          "buildMs": 66.401208,
-          "retainedHeapBytes": 20955648,
-          "retainedArrayBufferBytes": -58988
+          "buildMs": 68.02737500000012,
+          "retainedHeapBytes": 20957216,
+          "retainedArrayBufferBytes": -23856
         },
         {
-          "buildMs": 64.91941699999984,
-          "retainedHeapBytes": 21006280,
+          "buildMs": 65.97191600000019,
+          "retainedHeapBytes": 21004824,
           "retainedArrayBufferBytes": 0
         },
         {
-          "buildMs": 65.60483299999987,
-          "retainedHeapBytes": 21001208,
+          "buildMs": 65.86033299999986,
+          "retainedHeapBytes": 21001560,
           "retainedArrayBufferBytes": 0
         }
       ],
       "search": {
         "samples": 200,
-        "p50Ms": 1.1153340000000753,
-        "p95Ms": 2.684332999999924,
-        "meanMs": 1.256638345,
-        "maxMs": 4.532166000000188,
+        "p50Ms": 1.068958000000066,
+        "p95Ms": 2.289250000000038,
+        "meanMs": 1.1674072850000052,
+        "maxMs": 3.9456250000000637,
         "queriesWithHits": 173
       }
     },
     {
       "library": "Fuse",
       "size": 10000,
-      "buildMs": 36.75770800000009,
-      "retainedHeapBytes": 13719344,
+      "buildMs": 35.14979200000016,
+      "retainedHeapBytes": 13720208,
       "retainedArrayBufferBytes": 0,
       "buildRuns": [
         {
-          "buildMs": 36.0669170000001,
-          "retainedHeapBytes": 13682584,
+          "buildMs": 34.29645899999991,
+          "retainedHeapBytes": 13680984,
           "retainedArrayBufferBytes": 0
         },
         {
-          "buildMs": 36.75770800000009,
-          "retainedHeapBytes": 13719344,
+          "buildMs": 35.14979200000016,
+          "retainedHeapBytes": 13720208,
           "retainedArrayBufferBytes": 0
         },
         {
-          "buildMs": 37.4562920000003,
-          "retainedHeapBytes": 13723224,
+          "buildMs": 36.00350000000003,
+          "retainedHeapBytes": 13725192,
           "retainedArrayBufferBytes": 0
         }
       ],
       "search": {
         "samples": 200,
-        "p50Ms": 100.87616699999853,
-        "p95Ms": 150.932208000002,
-        "meanMs": 103.87033537500002,
-        "maxMs": 182.9175410000007,
+        "p50Ms": 98.37437499999987,
+        "p95Ms": 150.29295899999852,
+        "meanMs": 101.43641998499992,
+        "maxMs": 180.82983299999978,
         "queriesWithHits": 189
       }
     },
     {
       "library": "Orama",
       "size": 10000,
-      "buildMs": 113.05441699999938,
-      "retainedHeapBytes": 37811976,
+      "buildMs": 111.04320799999914,
+      "retainedHeapBytes": 37806728,
       "retainedArrayBufferBytes": 0,
       "buildRuns": [
         {
-          "buildMs": 113.05441699999938,
-          "retainedHeapBytes": 38013368,
+          "buildMs": 111.04320799999914,
+          "retainedHeapBytes": 38013744,
           "retainedArrayBufferBytes": 0
         },
         {
-          "buildMs": 111.1149579999983,
-          "retainedHeapBytes": 37756368,
+          "buildMs": 109.47533300000214,
+          "retainedHeapBytes": 37758032,
           "retainedArrayBufferBytes": 0
         },
         {
-          "buildMs": 114.4933749999982,
-          "retainedHeapBytes": 37811976,
+          "buildMs": 111.75108300000284,
+          "retainedHeapBytes": 37806728,
           "retainedArrayBufferBytes": 0
         }
       ],
       "search": {
         "samples": 200,
-        "p50Ms": 15.449749999999767,
-        "p95Ms": 59.21674999999959,
-        "meanMs": 17.684376259999933,
-        "maxMs": 82.5221249999995,
+        "p50Ms": 14.674125000001368,
+        "p95Ms": 58.24187499999971,
+        "meanMs": 16.863145414999913,
+        "maxMs": 75.1374160000014,
         "queriesWithHits": 121
       }
     },
     {
       "library": "FlexSearch",
       "size": 10000,
-      "buildMs": 182.0952920000018,
-      "retainedHeapBytes": 59967000,
+      "buildMs": 201.79408300000068,
+      "retainedHeapBytes": 59966104,
       "retainedArrayBufferBytes": 0,
       "buildRuns": [
         {
-          "buildMs": 185.3559580000001,
-          "retainedHeapBytes": 60995840,
+          "buildMs": 201.79408300000068,
+          "retainedHeapBytes": 61001656,
           "retainedArrayBufferBytes": 0
         },
         {
-          "buildMs": 178.4474169999994,
-          "retainedHeapBytes": 59878976,
+          "buildMs": 209.2528749999983,
+          "retainedHeapBytes": 59966104,
           "retainedArrayBufferBytes": 0
         },
         {
-          "buildMs": 182.0952920000018,
-          "retainedHeapBytes": 59967000,
+          "buildMs": 197.68933400000242,
+          "retainedHeapBytes": 59961624,
           "retainedArrayBufferBytes": 0
         }
       ],
       "search": {
         "samples": 200,
-        "p50Ms": 0.004750000000058208,
-        "p95Ms": 0.25404100000014296,
-        "meanMs": 0.05058911000003719,
-        "maxMs": 0.4671669999988808,
+        "p50Ms": 0.004832999999052845,
+        "p95Ms": 0.24383300000044983,
+        "meanMs": 0.04878502000006847,
+        "maxMs": 0.4563750000015716,
         "queriesWithHits": 50
       }
     },
     {
       "library": "fuzzysort",
       "size": 10000,
-      "buildMs": 0.028374999998050043,
+      "buildMs": 0.030416999998124084,
       "retainedHeapBytes": 80888,
       "retainedArrayBufferBytes": 0,
       "buildRuns": [
         {
-          "buildMs": 0.8644999999996799,
+          "buildMs": 0.9483749999999418,
           "retainedHeapBytes": 65168,
           "retainedArrayBufferBytes": 0
         },
         {
-          "buildMs": 0.028374999998050043,
-          "retainedHeapBytes": 80888,
+          "buildMs": 0.030416999998124084,
+          "retainedHeapBytes": 80984,
           "retainedArrayBufferBytes": 0
         },
         {
-          "buildMs": 0.023083000000042375,
+          "buildMs": 0.02329200000167475,
           "retainedHeapBytes": 80888,
           "retainedArrayBufferBytes": 0
         }
       ],
       "search": {
         "samples": 200,
-        "p50Ms": 1.8892500000001746,
-        "p95Ms": 4.306584000001749,
-        "meanMs": 2.177029814999877,
-        "maxMs": 9.555457999998907,
+        "p50Ms": 1.939542000000074,
+        "p95Ms": 4.308667000001151,
+        "meanMs": 2.166126044999927,
+        "maxMs": 9.451457999999548,
         "queriesWithHits": 48
       }
     },
     {
       "library": "uFuzzy",
       "size": 10000,
-      "buildMs": 2.8692919999994047,
-      "retainedHeapBytes": 1514840,
+      "buildMs": 2.811667000001762,
+      "retainedHeapBytes": 1543352,
       "retainedArrayBufferBytes": 0,
       "buildRuns": [
         {
-          "buildMs": 8.905041000001802,
-          "retainedHeapBytes": 1514840,
+          "buildMs": 7.314332999998442,
+          "retainedHeapBytes": 1513216,
           "retainedArrayBufferBytes": 0
         },
         {
-          "buildMs": 2.8692919999994047,
-          "retainedHeapBytes": 1476552,
+          "buildMs": 2.811667000001762,
+          "retainedHeapBytes": 1543352,
           "retainedArrayBufferBytes": 0
         },
         {
-          "buildMs": 2.7981670000008307,
+          "buildMs": 2.681625000001077,
           "retainedHeapBytes": 1560560,
           "retainedArrayBufferBytes": 0
         }
       ],
       "search": {
         "samples": 200,
-        "p50Ms": 1.9367500000007567,
-        "p95Ms": 7.693875000000844,
-        "meanMs": 3.076164960000224,
-        "maxMs": 24.62920899999881,
+        "p50Ms": 1.7456249999995634,
+        "p95Ms": 7.323292000000947,
+        "meanMs": 2.7960039649999984,
+        "maxMs": 23.14141699999891,
         "queriesWithHits": 90
       }
     },
     {
       "library": "typoseek",
       "size": 100000,
-      "buildMs": 867.1122920000053,
-      "retainedHeapBytes": 118507512,
-      "retainedArrayBufferBytes": 1132064,
+      "buildMs": 852.2849999999999,
+      "retainedHeapBytes": 118518032,
+      "retainedArrayBufferBytes": 1071576,
       "buildRuns": [
         {
-          "buildMs": 910.7330000000002,
-          "retainedHeapBytes": 90583632,
+          "buildMs": 852.2849999999999,
+          "retainedHeapBytes": 90523136,
           "retainedArrayBufferBytes": 2297532
         },
         {
-          "buildMs": 807.9335829999982,
-          "retainedHeapBytes": 118507512,
-          "retainedArrayBufferBytes": 929204
+          "buildMs": 899.872166000001,
+          "retainedHeapBytes": 118518032,
+          "retainedArrayBufferBytes": 950680
         },
         {
-          "buildMs": 867.1122920000053,
-          "retainedHeapBytes": 118528256,
-          "retainedArrayBufferBytes": 1132064
+          "buildMs": 792.1397919999981,
+          "retainedHeapBytes": 118522368,
+          "retainedArrayBufferBytes": 1071576
         }
       ],
       "search": {
         "samples": 200,
-        "p50Ms": 13.158292000000074,
-        "p95Ms": 29.64862500000163,
-        "meanMs": 14.547114204999849,
-        "maxMs": 46.879875000005995,
+        "p50Ms": 11.92316700000083,
+        "p95Ms": 28.88954200000444,
+        "meanMs": 13.616586655000031,
+        "maxMs": 42.05091700000048,
         "queriesWithHits": 186
       }
     },
     {
       "library": "MiniSearch",
       "size": 100000,
-      "buildMs": 1056.7301660000012,
-      "retainedHeapBytes": 104184768,
+      "buildMs": 891.7805419999931,
+      "retainedHeapBytes": 104186928,
       "retainedArrayBufferBytes": 0,
       "buildRuns": [
         {
-          "buildMs": 1056.7301660000012,
-          "retainedHeapBytes": 103666744,
+          "buildMs": 891.7805419999931,
+          "retainedHeapBytes": 104069776,
           "retainedArrayBufferBytes": 0
         },
         {
-          "buildMs": 1057.1931669999976,
-          "retainedHeapBytes": 104188408,
+          "buildMs": 961.0392500000016,
+          "retainedHeapBytes": 104192792,
           "retainedArrayBufferBytes": 0
         },
         {
-          "buildMs": 953.4571250000008,
-          "retainedHeapBytes": 104184768,
+          "buildMs": 868.3153750000056,
+          "retainedHeapBytes": 104186928,
           "retainedArrayBufferBytes": 0
         }
       ],
       "search": {
         "samples": 200,
-        "p50Ms": 6.192541000003985,
-        "p95Ms": 31.801625000000058,
-        "meanMs": 10.411587279999841,
-        "maxMs": 63.303875000005064,
+        "p50Ms": 5.170500000000175,
+        "p95Ms": 28.92591700000048,
+        "meanMs": 9.557713140000233,
+        "maxMs": 57.11420899999939,
         "queriesWithHits": 165
       }
     },
     {
       "library": "Fuse",
       "size": 100000,
-      "buildMs": 394.2849580000038,
-      "retainedHeapBytes": 127719944,
+      "buildMs": 350.6080839999995,
+      "retainedHeapBytes": 127719264,
       "retainedArrayBufferBytes": 0,
       "buildRuns": [
         {
-          "buildMs": 430.8395410000012,
-          "retainedHeapBytes": 123000104,
+          "buildMs": 350.5676669999957,
+          "retainedHeapBytes": 127672760,
           "retainedArrayBufferBytes": 0
         },
         {
-          "buildMs": 394.2849580000038,
-          "retainedHeapBytes": 127719944,
+          "buildMs": 350.6080839999995,
+          "retainedHeapBytes": 127719264,
           "retainedArrayBufferBytes": 0
         },
         {
-          "buildMs": 377.73116599999776,
-          "retainedHeapBytes": 127721544,
+          "buildMs": 376.8495830000029,
+          "retainedHeapBytes": 127719792,
           "retainedArrayBufferBytes": 0
         }
       ],
       "search": {
         "samples": 200,
-        "p50Ms": 1028.7485000000015,
-        "p95Ms": 1546.175792000009,
-        "meanMs": 1056.9634624750013,
-        "maxMs": 1875.6100420000002,
+        "p50Ms": 1001.4294580000278,
+        "p95Ms": 1505.0103329999838,
+        "meanMs": 1029.6713714849998,
+        "maxMs": 1819.6416250000038,
         "queriesWithHits": 188
       }
     },
     {
       "library": "Orama",
       "size": 100000,
-      "buildMs": 1506.8243329999968,
-      "retainedHeapBytes": 243271088,
+      "buildMs": 1541.1029580000322,
+      "retainedHeapBytes": 243214752,
       "retainedArrayBufferBytes": 0,
       "buildRuns": [
         {
-          "buildMs": 1465.9689159999834,
-          "retainedHeapBytes": 243402504,
+          "buildMs": 1572.599749999994,
+          "retainedHeapBytes": 238723704,
           "retainedArrayBufferBytes": 0
         },
         {
-          "buildMs": 1506.8243329999968,
-          "retainedHeapBytes": 243223184,
+          "buildMs": 1497.7757920000004,
+          "retainedHeapBytes": 243284808,
           "retainedArrayBufferBytes": 0
         },
         {
-          "buildMs": 1588.1543749999837,
-          "retainedHeapBytes": 243271088,
+          "buildMs": 1541.1029580000322,
+          "retainedHeapBytes": 243214752,
           "retainedArrayBufferBytes": 0
         }
       ],
       "search": {
         "samples": 200,
-        "p50Ms": 65.33404200000223,
-        "p95Ms": 5176.205332999991,
-        "meanMs": 687.7119656250006,
-        "maxMs": 6818.0366669999785,
+        "p50Ms": 58.32129199994961,
+        "p95Ms": 5141.667375000019,
+        "meanMs": 678.3791475049986,
+        "maxMs": 6637.040957999998,
         "queriesWithHits": 143
       }
     },
     {
       "library": "FlexSearch",
       "size": 100000,
-      "buildMs": 2104.4462500000373,
+      "buildMs": 2170.7678750000196,
       "retainedHeapBytes": 256164544,
       "retainedArrayBufferBytes": 0,
       "buildRuns": [
         {
-          "buildMs": 1987.318499999994,
-          "retainedHeapBytes": 257400584,
+          "buildMs": 2019.5196250000154,
+          "retainedHeapBytes": 257457600,
           "retainedArrayBufferBytes": 0
         },
         {
-          "buildMs": 2234.9637079999666,
-          "retainedHeapBytes": 256157792,
+          "buildMs": 2170.7678750000196,
+          "retainedHeapBytes": 256076632,
           "retainedArrayBufferBytes": 0
         },
         {
-          "buildMs": 2104.4462500000373,
+          "buildMs": 2285.0380000000005,
           "retainedHeapBytes": 256164544,
           "retainedArrayBufferBytes": 0
         }
       ],
       "search": {
         "samples": 200,
-        "p50Ms": 0.006290999997872859,
-        "p95Ms": 3.447875000012573,
-        "meanMs": 0.45017100500001106,
-        "maxMs": 5.599500000011176,
+        "p50Ms": 0.006832999992184341,
+        "p95Ms": 3.603833000001032,
+        "meanMs": 0.49804147999762793,
+        "maxMs": 6.371707999962382,
         "queriesWithHits": 51
       }
     },
     {
       "library": "fuzzysort",
       "size": 100000,
-      "buildMs": 0.12329099996713921,
+      "buildMs": 0.13750000001164153,
       "retainedHeapBytes": 801000,
       "retainedArrayBufferBytes": 0,
       "buildRuns": [
         {
-          "buildMs": 3.2772920000134036,
+          "buildMs": 2.4851249999483116,
           "retainedHeapBytes": 784016,
           "retainedArrayBufferBytes": 0
         },
         {
-          "buildMs": 0.11895799997728318,
+          "buildMs": 0.13750000001164153,
           "retainedHeapBytes": 801000,
           "retainedArrayBufferBytes": 0
         },
         {
-          "buildMs": 0.12329099996713921,
+          "buildMs": 0.1299579999758862,
           "retainedHeapBytes": 801000,
           "retainedArrayBufferBytes": 0
         }
       ],
       "search": {
         "samples": 200,
-        "p50Ms": 32.63937499996973,
-        "p95Ms": 61.39779199997429,
-        "meanMs": 34.89238102999892,
-        "maxMs": 109.39850000001024,
+        "p50Ms": 32.168333999987226,
+        "p95Ms": 61.407540999993216,
+        "meanMs": 34.7170912650015,
+        "maxMs": 110.48579200002132,
         "queriesWithHits": 53
       }
     },
     {
       "library": "uFuzzy",
       "size": 100000,
-      "buildMs": 28.126583000004757,
-      "retainedHeapBytes": 15568856,
+      "buildMs": 27.968916999991052,
+      "retainedHeapBytes": 15568792,
       "retainedArrayBufferBytes": 0,
       "buildRuns": [
         {
-          "buildMs": 28.126583000004757,
-          "retainedHeapBytes": 15568856,
+          "buildMs": 28.146000000007916,
+          "retainedHeapBytes": 15568792,
           "retainedArrayBufferBytes": 0
         },
         {
-          "buildMs": 27.886959000024945,
+          "buildMs": 27.968916999991052,
           "retainedHeapBytes": 15504056,
           "retainedArrayBufferBytes": 0
         },
         {
-          "buildMs": 28.53479200002039,
+          "buildMs": 27.50199999997858,
           "retainedHeapBytes": 15576512,
           "retainedArrayBufferBytes": 0
         }
       ],
       "search": {
         "samples": 200,
-        "p50Ms": 14.90662500000326,
-        "p95Ms": 69.0549170000013,
-        "meanMs": 29.137210219999538,
-        "maxMs": 151.33533300005365,
+        "p50Ms": 14.295290999987628,
+        "p95Ms": 66.61783300002571,
+        "meanMs": 28.192268765003238,
+        "maxMs": 151.2237090000417,
         "queriesWithHits": 91
       }
     }
@@ -521,9 +521,9 @@
   "asyncSlices": {
     "records": 100000,
     "probe": "self-rescheduling setTimeout(0); a gap that grows the index is a commit slice, one that shrinks it a rollback slice, one before the first commit a preparation slice",
-    "longestPreparationGapMs": 31.58333400002448,
-    "longestCommitGapMs": 49.898707999964245,
-    "longestRollbackGapMs": 32.716709000000264,
+    "longestPreparationGapMs": 29.001416999963112,
+    "longestCommitGapMs": 60.24849999998696,
+    "longestRollbackGapMs": 39.338166999979876,
     "abortedAtRecords": 50000
   }
 }

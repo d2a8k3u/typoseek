@@ -698,20 +698,20 @@ typoseek subsequence 0
 
 ## Performance
 
-Numbers from one run of `npm run bench` on 2026-11-11: Apple M4 Pro, 14 logical cores, 48 GiB, macOS (Darwin 27.3.0, arm64), Node v24.20.0. The dataset is 10,000 and 100,000 generated records with a title, a body and a tag, and 200 queries of 2 or 3 words, some with edits. They say nothing about other machines. The competitors are MiniSearch 7.2.0, Fuse 7.5.0, Orama 3.1.18, FlexSearch 0.8.212, fuzzysort 4.0.2 and uFuzzy 1.0.19; the median is over these six.
+Numbers from one run of `npm run bench` on 2026-11-27: Apple M4 Pro, 14 logical cores, 48 GiB, macOS (Darwin 27.3.0, arm64), Node v24.20.0. The dataset is 10,000 and 100,000 generated records with a title, a body and a tag, and 200 queries of 2 or 3 words, some with edits. They say nothing about other machines. The competitors are MiniSearch 7.2.0, Fuse 7.5.0, Orama 3.1.18, FlexSearch 0.8.212, fuzzysort 4.0.2 and uFuzzy 1.0.19; the median is over these six.
 
 | Records | Measure            | typoseek | Competitor median |
 | ------- | ------------------ | -------- | ----------------- |
-| 10,000  | Search p95 (ms)    | 8.41     | 6.00              |
-| 10,000  | Build time (ms)    | 135      | 51                |
+| 10,000  | Search p95 (ms)    | 7.48     | 5.82              |
+| 10,000  | Build time (ms)    | 124      | 51                |
 | 10,000  | Retained heap (MB) | 28.2     | 17.4              |
-| 100,000 | Search p95 (ms)    | 29.65    | 65.23             |
-| 100,000 | Build time (ms)    | 867      | 726               |
+| 100,000 | Search p95 (ms)    | 28.89    | 64.01             |
+| 100,000 | Build time (ms)    | 852      | 621               |
 | 100,000 | Retained heap (MB) | 118.5    | 116.0             |
 
-Retained heap at 100,000 records is 2.56 MB (2.2%) above the competitor median, so typoseek misses its memory target of staying below it. It also keeps 1.13 MB in array buffers that `heapUsed` does not count.
+Retained heap at 100,000 records is 2.56 MB (2.2%) above the competitor median, so typoseek misses its memory target of staying below it. It also keeps 1.07 MB in array buffers that `heapUsed` does not count.
 
-The libraries do not return the same matches: at both sizes typoseek returned results for 186 of the 200 queries and the other libraries for 48 to 189. [BENCHMARK.md](BENCHMARK.md) has p50, every library, the settings each ran with and how to rerun it. While `addAllAsync` indexed 100,000 records, the longest gap between event loop callbacks was 31.6 ms in a preparation slice, 49.9 ms in a commit slice and 32.7 ms in a rollback slice on that machine.
+The libraries do not return the same matches: at both sizes typoseek returned results for 186 of the 200 queries and the other libraries for 48 to 189. [BENCHMARK.md](BENCHMARK.md) has p50, every library, the settings each ran with and how to rerun it. While `addAllAsync` indexed 100,000 records, the longest gap between event loop callbacks was 29.0 ms in a preparation slice, 60.2 ms in a commit slice and 39.3 ms in a rollback slice on that machine.
 
 ## API reference
 
