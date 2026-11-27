@@ -1,0 +1,38 @@
+name: Bug report
+description: typoseek returns wrong results, throws an unexpected error or crashes.
+labels: [bug]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: typoseek version
+    validations:
+      required: true
+  - type: input
+    id: runtime
+    attributes:
+      label: Runtime and version
+      description: Node, Bun, Deno or the browser, with its version.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: The smallest code and data that show the problem.
+      render: ts
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual result
+      description: The output, or the error with its `code` and message.
+    validations:
+      required: true
