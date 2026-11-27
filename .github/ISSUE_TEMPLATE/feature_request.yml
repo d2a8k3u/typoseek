@@ -1,0 +1,22 @@
+name: Feature request
+description: Propose a new option, API or behaviour.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What you are trying to do and where typoseek gets in the way.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed API
+      description: How you would call it.
+      render: ts
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives
+      description: What you use today instead, or what you tried.

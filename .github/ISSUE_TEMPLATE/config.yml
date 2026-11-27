@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question
+    url: https://github.com/d2a8k3u/typoseek/discussions/categories/q-a
+    about: Ask how to use typoseek in Discussions.
+  - name: Security vulnerability
+    url: https://github.com/d2a8k3u/typoseek/security/advisories/new
+    about: Report it privately, never in a public issue.
